@@ -1,6 +1,39 @@
 import styles from './CabelFilter.module.css'
 import image from '/img/header/heart.png'
 import image1 from '/img/header/stats.png'
+import checkmark from '/img/Okey.png'
+
+const StarRating = ({ rating }) => {
+	const fullStars = Math.floor(rating);
+	const hasHalfStar = rating % 1 !== 0;
+	
+	return (
+		<div className={styles.starRating}>
+			{[...Array(5)].map((_, index) => {
+				if (index < fullStars) {
+					return <span key={index} className={styles.star}>★</span>;
+				} else if (index === fullStars && hasHalfStar) {
+					return <span key={index} className={`${styles.star} ${styles.halfStar}`}>★</span>;
+				}
+				return <span key={index} className={`${styles.star} ${styles.emptyStar}`}>★</span>;
+			})}
+			<span className={styles.ratingNumber}>({rating})</span>
+		</div>
+	);
+};
+
+const manufacturers = [
+	{ id: 1, name: 'Производитель 1' },
+	{ id: 2, name: 'Производитель 2' },
+	{ id: 3, name: 'Производитель 3' }
+];
+
+const colors = [
+	{ id: 'white', name: 'Белый' },
+	{ id: 'black', name: 'Чёрный' },
+	{ id: 'blue', name: 'Синий' },
+	{ id: 'red', name: 'Красный' }
+];
 
 const products = [
 	{
@@ -10,9 +43,35 @@ const products = [
 		rating: 4.5,
 		price: 2990,
 		size: '160 × 38',
-		image: '/img/products/cable1.png'
+		image: '/img/products/image1.png'
 	},
-	// Добавьте больше товаров по необходимости
+	{
+		id: 2,
+		title: 'Наименование товара',
+		article: '1234567890',
+		rating: 4.5,
+		price: 2990,
+		size: '160 × 38',
+		image: '/img/products/image2.png'
+	},
+	{
+		id: 3,
+		title: 'Наименование товара',
+		article: '1234567890',
+		rating: 4.5,
+		price: 2990,
+		size: '160 × 38',
+		image: '/img/products/image3.png'
+	},
+	{
+		id: 4,
+		title: 'Наименование товара',
+		article: '1234567890',
+		rating: 4.5,
+		price: 2990,
+		size: '160 × 38',
+		image: '/img/products/image4.png'
+	},
 ];
 
 export default function CabelFilter() {
@@ -46,19 +105,28 @@ export default function CabelFilter() {
 					<div className={styles.legend_segment}>
 						<span className={styles.segment_line}></span>
 					</div>
-					<select className={styles.legend_efficiency}>
-						<option value="">Производитель</option>
-						<option value="1">Производитель 1</option>
-						<option value="2">Производитель 2</option>
-						<option value="3">Производитель 3</option>
-					</select>
-					<select className={styles.legend_color}>
-						<option value="">Цвет</option>
-						<option value="white">Белый</option>
-						<option value="black">Чёрный</option>
-						<option value="blue">Синий</option>
-						<option value="red">Красный</option>
-					</select>
+					
+					<div className={styles.checkboxGroup}>
+						<h3>Производитель</h3>
+						{manufacturers.map(manufacturer => (
+							<label key={manufacturer.id} className={styles.checkboxLabel}>
+								<input type="checkbox" className={styles.checkbox} />
+								<span className={styles.checkmark}></span>
+								{manufacturer.name}
+							</label>
+						))}
+					</div>
+
+					<div className={styles.checkboxGroup}>
+						<h3>Цвет</h3>
+						{colors.map(color => (
+							<label key={color.id} className={styles.checkboxLabel}>
+								<input type="checkbox" className={styles.checkbox} />
+								<span className={styles.checkmark}></span>
+								{color.name}
+							</label>
+						))}
+					</div>
 				</div>
 
 				<div className={styles.filter_cards}>
@@ -73,9 +141,7 @@ export default function CabelFilter() {
 							<div className={styles.card_title}>
 								<h2>{product.title}</h2>
 								<span>Артикул: {product.article}</span>
-								<div className={styles.card_star_rating}>
-									<span>Рейтинг: {product.rating}</span>
-								</div>
+								<StarRating rating={product.rating} />
 							</div>
 							<div className={styles.card_more}>
 								<h2>{product.price} ₽</h2>
