@@ -1,34 +1,51 @@
-import styles from "./mainFind.module.css"
+import { useState } from 'react';
+import styles from './MainFind.module.css';
+import Modal from '../../Modal/Modal';
 
-export default function MainFind(){
-	return(
-		<div className={styles.find}>
-			<div className={styles.container}>
-				<div className={styles.content}>
-					<div className={styles.selects}>
-						<div className={styles.typeCable}>
-							<span>Тип кабеля:</span>
-							<select>Тип кабеля</select>
-						</div>
-						<div className={styles.typeCable}>
-							<span>Длина кабеля:</span>
-							<select>1 метр</select>
-						</div>
-						<div className={styles.typeCable}>
-							<span>Стоимость:</span>
-							<p>243 руб.</p>
-						</div>
-					</div>
-					<div className={styles.right}>
-						<h2>Лучшие цены напрямую от производителя. <br />Гарантия качества на всю продукцию!</h2>
-						<div className={styles.buttons}>
-							<button>Оформить заказ</button>
-							<button>Связаться с менеджером</button>
-							<button>Скачать прайс-лист</button>
-						</div>
+export default function MainFind() {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [formData, setFormData] = useState({
+		query: ''
+	});
+
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		console.log('Search query:', formData.query);
+		setIsModalOpen(true);
+		setFormData({ query: '' });
+	};
+
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setFormData({ query: e.target.value });
+	};
+
+	return (
+		<>
+			<div className={styles.mainFind}>
+				<div className={styles.mainFind_container}>
+					<div className={styles.mainFind_content}>
+						<h2>Не нашли то, что искали?</h2>
+						<p>Оставьте заявку и мы найдем нужный вам товар</p>
+						<form onSubmit={handleSubmit}>
+							<input
+								type="text"
+								placeholder="Введите название товара"
+								value={formData.query}
+								onChange={handleChange}
+								required
+							/>
+							<button type="submit">Найти</button>
+						</form>
 					</div>
 				</div>
 			</div>
-		</div>
-	)
+
+			<Modal
+				isOpen={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				title="Спасибо за запрос!"
+				message="Мы начали поиск вашего товара и свяжемся с вами в ближайшее время."
+			/>
+		</>
+	);
 }

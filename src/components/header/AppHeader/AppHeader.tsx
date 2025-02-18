@@ -6,7 +6,7 @@ import Actions from '../Actions'
 import styles from "./header.module.css";
 import PhoneMap from '../PhoneMap/PhoneMap'
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 export default function Header() {
 	const navigate = useNavigate();
@@ -30,9 +30,9 @@ export default function Header() {
 		<header className={styles.header}>
 			<div className={styles.header_container}>
 				<div className={styles.header_content}>
-					<div className={styles.header_logo}>
+					<Link to="/" className={styles.header_logo}>
 						Logo
-					</div>
+					</Link>
 					{windowWidth < 1180 && <PhoneMap />}
 					<div className={styles.header_serchCatal}>
 						<div className={styles.header_catalog}>
