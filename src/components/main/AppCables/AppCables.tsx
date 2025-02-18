@@ -16,13 +16,6 @@ import image10 from "/img/Cables/image-10.jpg"
 import image11 from "/img/Cables/image-11.jpg"
 
 export default function AppCables() {
-//   const cabels_content = {
-//     display: "grid",
-//     gridTemplateColumns: "repeat(4, 1fr)", 
-//     gridTemplateRows: "auto", 
-//     gap: "20px", 
-//   };
-
   return (
     <div className={styles.container}>
       <div className={styles.content}>

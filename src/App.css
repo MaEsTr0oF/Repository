@@ -10,7 +10,9 @@
 
 html {
   scroll-behavior: smooth;
-  font-size: 16px; /* Базовый размер шрифта */
+  font-size: 16px; 
+  overflow-y: scroll;
+	overflow-x: hidden;
 }
 
 body {
@@ -20,6 +22,7 @@ body {
   color: #000;
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%
 }
 
 /* Убираем стандартный outline у элементов при фокусе (но оставляем его для доступности) */

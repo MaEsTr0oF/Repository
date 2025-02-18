@@ -1,0 +1,22 @@
+.card{
+	display: flex;
+	width: 100%;
+	box-shadow: 2px -2px 0 0 rgba(0, 0, 0, 0.1);
+}
+.image{
+	object-fit: cover;
+	width:100%;
+}
+.card{
+	font-size: 18px;
+	font-weight: 500;
+	padding: 20px 30px ;
+}
+.cabel{
+	padding-left:20px ;
+}
+.products{
+	display: grid;
+	grid-template-columns: repeat(4,1fr);
+	grid-template-rows: repeat(auto-fill);
+}
