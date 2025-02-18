@@ -1,4 +1,3 @@
-import React from "react";
 import teleg from "/img/teleg.png";
 import whats from "/img/whats.png";
 import "./MainContForm.css";

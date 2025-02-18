@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import './App.css'
 import AppHeader from "./components/header/AppHeader/AppHeader.tsx"
 import SubHeader from './components/header/SubHeader'
 import Footer from './components/Footer/Footer.tsx'
 import Main from './components/Main.tsx'
 import BurgerMenu from "./components/Burger/Burger.tsx";
-import PhoneMap from "./components/header/PhoneMap/PhoneMap.tsx"
 function App() {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 	useEffect(() => {
