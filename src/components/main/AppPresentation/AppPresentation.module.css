@@ -1,8 +1,8 @@
 .presentation{
-	background-image:url("/img/Presentation.png");
-	background-size:cover;
-	background-position:center;
-	width:100%;
+	background-image: url("/img/Presentation.png");
+	background-size: cover;
+	background-position: center;
+	width: 100%;
 	margin-bottom: 90px;
 }
 .presentation_container{

@@ -1,19 +1,21 @@
 import ProductCard from "../ProductCard";
 import styles from "./AppCables.module.css";
-import image from "/img/Cables/image.jpg"
-import imag1 from "/img/Cables/image1.jpg"
-import imag12 from "/img/Cables/image12.jpg"
-import image1 from "/img/Cables/image-1.jpg"
-import image2 from "/img/Cables/image-2.jpg"
-import image3 from "/img/Cables/image-3.jpg"
-import image4 from "/img/Cables/image-4.jpg"
-import image5 from "/img/Cables/image-5.jpg"
-import image6 from "/img/Cables/image-6.jpg"
-import image7 from "/img/Cables/image-7.jpg"
-import image8 from "/img/Cables/image-8.jpg"
-import image9 from "/img/Cables/image-9.jpg"
-import image10 from "/img/Cables/image-10.jpg"
-import image11 from "/img/Cables/image-11.jpg"
+
+// Используем правильные пути к изображениям из public
+const image = "/img/Cables/image.jpg";
+const imag1 = "/img/Cables/image1.jpg";
+const imag12 = "/img/Cables/image12.jpg";
+const image1 = "/img/Cables/image-1.jpg";
+const image2 = "/img/Cables/image-2.jpg";
+const image3 = "/img/Cables/image-3.jpg";
+const image4 = "/img/Cables/image-4.jpg";
+const image5 = "/img/Cables/image-5.jpg";
+const image6 = "/img/Cables/image-6.jpg";
+const image7 = "/img/Cables/image-7.jpg";
+const image8 = "/img/Cables/image-8.jpg";
+const image9 = "/img/Cables/image-9.jpg";
+const image10 = "/img/Cables/image-10.jpg";
+const image11 = "/img/Cables/image-11.jpg";
 
 export default function AppCables() {
   return (
