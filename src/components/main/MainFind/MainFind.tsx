@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import styles from './MainFind.module.css';
+import styles from './mainFind.module.css';
 import Modal from '../../Modal/Modal';
 
 export default function MainFind() {
