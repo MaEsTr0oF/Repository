@@ -1,0 +1,42 @@
+.subHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 19px;
+  margin-bottom: 25px;
+  background-color: #fff;
+}
+
+.navigation {
+  display: flex;
+  gap: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.navLink {
+  color: #333;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  padding: 5px 0;
+  position: relative;
+}
+
+.navLink:hover {
+  color: #28a745;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background-color: #28a745;
+  transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}

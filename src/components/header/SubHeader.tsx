@@ -1,21 +1,17 @@
+import { Link } from "react-router-dom";
+import PhoneMap from "./PhoneMap/PhoneMap";
+import styles from "./SubHeader.module.css";
 
-import PhoneMap from "./PhoneMap/PhoneMap"
-export default function SubHeader(){
-	return(
-		<div style={{
-			display:"flex",
-			justifyContent:"space-between",
-			alignItems:"center",
-			padding:"0 19px",
-			marginBottom:25
-		}}>
-			<div style={{fontSize:"1rem",display:"flex",gap:25,fontWeight:"bold"}}>
-				<button>О компании</button>
-				<button>Покупателям</button>
-				<button>Оплата и доставка</button>
-				<button>Контакты</button>
-			</div>
-			<PhoneMap />
-		</div>
-	)
+export default function SubHeader() {
+  return (
+    <div className={styles.subHeader}>
+      <div className={styles.navigation}>
+        <Link to="/about" className={styles.navLink}>О компании</Link>
+        <Link to="/buyers" className={styles.navLink}>Покупателям</Link>
+        <Link to="/delivery" className={styles.navLink}>Оплата и доставка</Link>
+        <Link to="/contacts" className={styles.navLink}>Контакты</Link>
+      </div>
+      <PhoneMap />
+    </div>
+  );
 }
