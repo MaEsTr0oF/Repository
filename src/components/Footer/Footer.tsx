@@ -1,52 +1,37 @@
+import { Link } from 'react-router-dom';
 import styles from "./Footer.module.css"; // Импортируем стили
 
 export default function Footer() {
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerContainer}>
-        <div className={styles.footerLogoContainer}>
-          <h1 className={styles.footerLogo}>Logo</h1>
-          <p className={styles.footerDescription}>
-            Интернет-магазин строительных кабелей
-          </p>
-        </div>
-        <div className={styles.footerLinksContainer}>
-          <ul className={styles.footerList}>
-            <li className={styles.footerListItem}>
-              <a href="#" className={styles.footerLink}>
-                Покупателям
-              </a>
-            </li>
-            <li className={styles.footerListItem}>
-              <a href="#" className={styles.footerLink}>
-                О компании
-              </a>
-            </li>
-            <li className={styles.footerListItem}>
-              <a href="#" className={styles.footerLink}>
-                Контакты
-              </a>
-            </li>
-          </ul>
-          <ul className={styles.footerList}>
-            <li className={styles.footerListItem}>
-              <a href="#" className={styles.footerLink}>
-                Политика конфиденциальности
-              </a>
-            </li>
-            <li className={styles.footerListItem}>
-              <a href="#" className={styles.footerLink}>
-                Договор публичной оферты
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div className={styles.footerContacts}>
-          <div className={styles.footerContactsInfo}>
-            <p className={styles.footerPhone}>+7 (999) 999-999</p>
-            <p className={styles.footerEmail}>Email: info@mail.ru</p>
+      <div className={styles.footer_wrapper}>
+        <div className={styles.footer_content}>
+          <div className={styles.footer_left}>
+            <Link to="/" className={styles.logo}>Logo</Link>
+            <p className={styles.subtitle}>Интернет-магазин силовых кабелей</p>
           </div>
-          <button className={styles.footerButton}>Наверх</button>
+          
+          <nav className={styles.footer_nav}>
+            <ul className={styles.nav_list}>
+              <li><Link to="/buyers">Покупателям</Link></li>
+              <li><Link to="/policy">Политика конфиденциальности</Link></li>
+              <li><Link to="/about">О компании</Link></li>
+            </ul>
+            <ul className={styles.nav_list}>
+              <li><Link to="/offer">Договор публичной оферты</Link></li>
+              <li><Link to="/contacts">Контакты</Link></li>
+              <li><Link to="/payment">Оплата</Link></li>
+              <li><Link to="/return">Возврат</Link></li>
+            </ul>
+          </nav>
+
+          <div className={styles.footer_right}>
+            <div className={styles.contact_info}>
+              <a href="tel:+7(999)999-999" className={styles.phone}>+7 (999) 999-999</a>
+              <a href="mailto:info@mail.ru" className={styles.email}>Email: info@mail.ru</a>
+            </div>
+            <button className={styles.button}>Наверх</button>
+          </div>
         </div>
       </div>
     </footer>

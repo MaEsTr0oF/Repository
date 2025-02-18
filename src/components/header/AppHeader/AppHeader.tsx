@@ -5,18 +5,27 @@ import card from '/img/header/card.png'
 import Actions from '../Actions'
 import styles from "./header.module.css";
 import PhoneMap from '../PhoneMap/PhoneMap'
-import  { useState, useEffect } from "react";
-export default function Header(){
+import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+
+export default function Header() {
+	const navigate = useNavigate();
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-		useEffect(() => {
-			function handleResize() {
-			  setWindowWidth(window.innerWidth);
-			}
-			window.addEventListener("resize", handleResize);
-		 return () => {
+	
+	useEffect(() => {
+		function handleResize() {
+			setWindowWidth(window.innerWidth);
+		}
+		window.addEventListener("resize", handleResize);
+		return () => {
 			window.removeEventListener("resize", handleResize);
-		 };
-	  }, []);
+		};
+	}, []);
+
+	const handleCatalogClick = () => {
+		navigate('/catalog');
+	};
+
 	return(
 		<header className={styles.header}>
 			<div className={styles.header_container}>
@@ -27,7 +36,10 @@ export default function Header(){
 					{windowWidth < 1180 && <PhoneMap />}
 					<div className={styles.header_serchCatal}>
 						<div className={styles.header_catalog}>
-							<button type='submit'><div className={styles.burger}><span></span></div>Каталог</button>
+							<button type='submit' onClick={handleCatalogClick}>
+								<div className={styles.burger}><span></span></div>
+								Каталог
+							</button>
 						</div>
 						<div className={styles.header_search}>
 							<input type="text" placeholder='Поиск по товарам'/>
@@ -35,13 +47,12 @@ export default function Header(){
 								<img src={search} alt="поиск" />
 							</button>
 						</div>
-						</div>
-						<div className={styles.header_actions}>
-							<Actions imagesrc={stat} label={"Сравнение"} />
-							<Actions imagesrc={heart} label={"Отложенные"} />
-							<Actions imagesrc={card} label={"Корзина"} />
-						</div>
-					
+					</div>
+					<div className={styles.header_actions}>
+						<Actions imagesrc={stat} label={"Сравнение"} />
+						<Actions imagesrc={heart} label={"Отложенные"} />
+						<Actions imagesrc={card} label={"Корзина"} />
+					</div>
 				</div>
 			</div>
 		</header>
