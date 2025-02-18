@@ -14,6 +14,9 @@ import Cart from "./components/Cart/Cart.tsx";
 import Favorites from "./components/Favorites/Favorites.tsx";
 import Subcategory from "./components/Subcategory/Subcategory.tsx";
 import ProductPage from "./components/ProductPage/ProductPage.tsx";
+import Contacts from "./components/Contacts/Contacts.tsx";
+import Buyers from "./components/Buyers/Buyers.tsx";
+import Compare from "./components/Compare/Compare.tsx";
 
 function App() {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -43,6 +46,9 @@ function App() {
 				<Route path="/favorites" element={<Favorites />} />
 				<Route path="/subcategory" element={<Subcategory />} />
 				<Route path="/product/:id" element={<ProductPage />} />
+				<Route path="/contacts" element={<Contacts />} />
+				<Route path="/buyers" element={<Buyers />} />
+				<Route path="/compare" element={<Compare />} />
 			</Routes>
 			<Footer />
 		</Router>

@@ -11,7 +11,9 @@ export default function SubHeader() {
         <Link to="/delivery" className={styles.navLink}>Оплата и доставка</Link>
         <Link to="/contacts" className={styles.navLink}>Контакты</Link>
       </div>
-      <PhoneMap />
+      <div className={styles.rightSection}>
+        <PhoneMap />
+      </div>
     </div>
   );
 }

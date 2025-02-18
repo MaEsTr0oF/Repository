@@ -1,0 +1,263 @@
+.compare {
+    padding: 20px 0;
+    background-color: #fff;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.breadcrumbs {
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 14px;
+}
+
+.breadcrumbs a {
+    color: #333;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumbs a:hover {
+    color: #2a9e44;
+}
+
+.breadcrumbs span {
+    margin: 0 8px;
+}
+
+.compareHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.compareHeader h1 {
+    font-size: 24px;
+    color: #333;
+}
+
+.compareActions {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.clearAll {
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.clearAll:hover {
+    border-color: #2a9e44;
+    color: #2a9e44;
+}
+
+.displayToggle label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.displayToggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+.compareContent {
+    overflow-x: auto;
+}
+
+.compareTable {
+    display: flex;
+    min-width: 100%;
+}
+
+.compareColumn {
+    min-width: 250px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.compareColumn:last-child {
+    border-right: none;
+}
+
+.columnHeader {
+    padding: 20px;
+    border-bottom: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.productImage {
+    width: 150px;
+    height: 150px;
+    margin: 0 auto 15px;
+}
+
+.productImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.columnHeader h3 {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.article {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.productActions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.addToCart {
+    padding: 8px 16px;
+    background: #2a9e44;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.addToCart:hover {
+    background: #238a3a;
+}
+
+.removeFromCompare {
+    padding: 8px 16px;
+    background: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.removeFromCompare:hover {
+    border-color: #ff4444;
+    color: #ff4444;
+}
+
+.characteristics {
+    padding: 20px;
+}
+
+.characteristicRow {
+    padding: 10px 0;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.characteristicRow:last-child {
+    border-bottom: none;
+}
+
+.addProduct {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.addButton {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 20px;
+    background: none;
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.addButton:hover {
+    border-color: #2a9e44;
+    color: #2a9e44;
+}
+
+.addButton span:first-child {
+    font-size: 24px;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    .compareHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .compareActions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .compareColumn {
+        min-width: 200px;
+    }
+
+    .productImage {
+        width: 120px;
+        height: 120px;
+    }
+
+    .columnHeader h3 {
+        font-size: 14px;
+    }
+
+    .price {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 480px) {
+    .compareColumn {
+        min-width: 180px;
+    }
+
+    .productImage {
+        width: 100px;
+        height: 100px;
+    }
+
+    .productActions {
+        gap: 5px;
+    }
+
+    .addToCart,
+    .removeFromCompare {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+} 
