@@ -1,7 +1,7 @@
 import styles from './ProductPage.module.css';
 import { Link } from 'react-router-dom';
-import image from '/img/header/heart.png';
-import image1 from '/img/header/stats.png';
+// import image from '/img/header/heart.png';
+// import image1 from '/img/header/stats.png';
 
 interface StarRatingProps {
     rating: number;
