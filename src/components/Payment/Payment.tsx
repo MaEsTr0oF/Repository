@@ -5,7 +5,6 @@ import image2 from '/img/payment/image2.png'
 import image3 from '/img/payment/image3.png'
 import image4 from '/img/payment/image4.png'
 import image5 from '/img/payment/image5.png'
-import image6 from '/img/payment/image6.png'
 
 export default function Payment() {
     return (
