@@ -1,0 +1,55 @@
+/* Контейнер для всех элементов */
+.container {
+	display: flex;
+	gap: 74px;
+	align-items: center;
+ }
+ 
+ /* Блок выбора города */
+ .citySelector {
+	display: flex;
+	align-items: center;
+	font-size: 1rem;
+	gap: 12px;
+ }
+ 
+ /* Иконки */
+ .icon {
+	object-fit: cover;
+	width: 16px;
+ }
+ 
+ .iconSmall {
+	object-fit: cover;
+	width: 11px;
+ }
+ 
+ /* Телефон */
+ .phoneNumber {
+	font-weight: bold;
+	font-size: 1rem;
+ }
+ 
+ /* Кнопка */
+ .button {
+	height: 35px;
+	width: 173px;
+	color: white;
+	background: #2a9e44;
+	padding: 0.5rem;
+	border-radius: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	cursor: pointer;
+	font-size: 1rem;
+ }
+ @media (max-width:1180px) {
+	.container{
+		gap: 10px;
+	}
+	.button{
+		display: none;
+	}
+ }

@@ -1,4 +1,5 @@
-import ProductCard from "./ProductCard";
+import ProductCard from "../ProductCard";
+import styles from "./AppCables.module.css";
 import image from "/img/Cables/image.jpg"
 import imag1 from "/img/Cables/image1.jpg"
 import imag12 from "/img/Cables/image12.jpg"
@@ -23,10 +24,10 @@ export default function AppCables() {
   };
 
   return (
-    <div style={{ padding: "0 20px",marginBottom:"40px" }}>
-      <div style={{ display: "flex", flexDirection: "column", gap: 45, justifyContent: "start" }}>
-        <h2 style={{ fontSize: 45, fontWeight: "bold", textAlign: "start" }}>Кабели</h2>
-        <div style={cabels_content}>
+    <div className={styles.container}>
+      <div className={styles.content}>
+        <h2 className={styles.title}>Кабели</h2>
+        <div className={styles.cables}>
           <ProductCard
             imagesrc={imag1}
             label="Силовой кабель"

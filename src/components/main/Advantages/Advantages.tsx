@@ -3,6 +3,7 @@ import achiv from "/img/Advantages/achiv.png"
 import delivery from "/img/Advantages/delivery.png"
 import doggovor from "/img/Advantages/doggovor.png"
 import time from "/img/Advantages/time.png"
+import styles from "./Advantages.module.css";
 interface ActionsProps {
 	imagesrc: string;
 	label: string;
@@ -15,17 +16,18 @@ export default function Advantages(){
 		{ imagesrc: delivery, label: "Доставка по России в срок" },
 		{ imagesrc: doggovor, label: "Работаем по договору" },
 	 ];
+	 
 	function Adv({imagesrc,label}:ActionsProps){
-		return(
-			<div style={{display:"flex",gap:15,alignItems:"center",marginBottom:"45px"}}>
-				<img src={imagesrc} alt="" />
-				<span style={{fontSize:18,lineHeight:"120%"}}>{label}</span>
+		return (
+			<div className={styles.productContainer}>
+			  <img className={styles.productImage} src={imagesrc} alt="" />
+			  <span className={styles.productLabel}>{label}</span>
 			</div>
-		)
+		 );
 	}
 	return(
 		<div style={{marginBottom:80}}>
-			<div style={{padding:"0 84px" , display:"flex",width:"100%",justifyContent:"space-between"}}>
+			<div className={styles.productCards}>
 				{advantagesList.map((adv, index) => (
 			<Adv key={index} imagesrc={adv.imagesrc} label={adv.label} />
 				))}

@@ -1,84 +1,4 @@
-/* Обнуляющие стили */
-*,
-*::before,
-*::after {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
 
-html {
-  scroll-behavior: smooth;
-  font-size: 16px; /* Базовый размер шрифта */
-}
-
-body {
-  font-family: Arial, sans-serif;
-  line-height: 1.5;
-  background-color: #fff;
-  color: #000;
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* Убираем стандартный outline у элементов при фокусе (но оставляем его для доступности) */
-button,
-input,
-textarea,
-select {
-  font: inherit;
-  border: none;
-  outline: none;
-}
-
-/* Убираем стандартный вид кнопок и ссылок */
-button {
-  cursor: pointer;
-  background: none;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-/* Убираем точки у списков */
-ul,
-ol {
-  list-style: none;
-}
-
-/* Обнуляем изображения */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-/* Обнуляем таблицы */
-table {
-  border-collapse: collapse;
-  width: 100%;
-}
-
-/* Убираем стандартный стиль прокрутки в Webkit (Chrome, Safari) */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
 
 .header{
 	padding: 18px;
@@ -89,6 +9,7 @@ table {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
+	gap:10px;
 }
 .header_logo{
 	font-weight: bold;
@@ -201,4 +122,30 @@ table {
 	width:60vw;
 	align-items: center;
 	justify-content: center;
+ }
+ @media (max-width:1180px) {
+	.header_actions{
+		display: none;
+	}
+	.header_content{
+		justify-content: start;
+	}
+	.header_catalog{
+		display:none;
+	}
+ }
+ @media (max-width:1100px) {
+	.header_serchCatal{
+		align-items: start;
+		justify-content: start;
+	}
+ }
+ @media (max-width:900px) {
+	.header_content{
+		flex-direction: column;
+		align-items: start;
+	}
+	.header_serchCatal{
+		width: 100%;
+	}
  }

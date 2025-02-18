@@ -1,22 +1,30 @@
-import {  } from 'react'
+import React, { useState, useEffect } from "react";
 import './App.css'
-import AppHeader from "./components/header/AppHeader"
+import AppHeader from "./components/header/AppHeader/AppHeader.tsx"
 import SubHeader from './components/header/SubHeader'
-import AppPresentation from './components/AppPresentatio.tsx'
-import Advantages from './components/Advantages.tsx'
-import AppCables from './components/AppCables.tsx'
-import Appelectric from './components/Appelectric.tsx'
-import AppAssec from './components/AppAssec.tsx'
+import Footer from './components/Footer/Footer.tsx'
+import Main from './components/Main.tsx'
+import BurgerMenu from "./components/Burger/Burger.tsx";
+import PhoneMap from "./components/header/PhoneMap/PhoneMap.tsx"
 function App() {
+	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+	useEffect(() => {
+		function handleResize() {
+		  setWindowWidth(window.innerWidth);
+		}
+		window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
   return (
     <>
 		<AppHeader />
-		<SubHeader />
-		<AppPresentation />
-		<Advantages />
-		<AppCables />
-		<Appelectric />
-		<AppAssec />
+		{windowWidth > 1180 && <SubHeader /> }
+		{windowWidth < 1180 && <BurgerMenu />}
+		
+		<Main />
+		<Footer />
     </>
   )
 }

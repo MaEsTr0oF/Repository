@@ -1,0 +1,82 @@
+.burgerMenu {
+	position: absolute;
+	right: 30px;
+	top: 30px;
+ }
+ 
+ /* Стили кнопки-бургера */
+ .burgerButton {
+	width: 40px;
+	height: 30px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 0;
+	z-index: 100;
+ }
+ 
+ .burgerButton span {
+	width: 100%;
+	height: 4px;
+	background: #333;
+	transition: all 0.3s ease;
+ }
+ 
+ /* Анимация кнопки при открытии */
+ .burgerButton.open span:nth-child(1) {
+	transform: translateY(12px) rotate(45deg);
+ }
+ 
+ .burgerButton.open span:nth-child(2) {
+	opacity: 0;
+ }
+ 
+ .burgerButton.open span:nth-child(3) {
+	transform: translateY(-12px) rotate(-45deg);
+ }
+ 
+ /* Меню */
+ .menu {
+	position: absolute;
+	z-index: 100;
+	top: 40px;
+	right: -140px;
+	background: white;
+	width: 300px;
+	height: 100vh;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	transform: translateX(150%);
+	transition: transform 0.3s ease;
+	border-radius: 40px;
+	border: 1px solid #2A9E44;
+ }
+ 
+ .menu.active {
+	transform: translateX(0);
+ }
+ 
+ .menu ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+ }
+ 
+ .menu li {
+	margin-bottom: 10px;
+ }
+ 
+ .menu a {
+	text-decoration: none;
+	color: #333;
+	font-size: 16px;
+	transition: color 0.2s;
+ }
+ 
+ .menu a:hover {
+	color: #2A9E44;
+ }
+ 

@@ -6,7 +6,7 @@ interface Props {
 }
 export default function ProductCard({imagesrc,label,text,cost}:Props){
 	return(
-	<div style={{display:"flex",flexDirection:"column",gap:15,width:"100%",alignItems:"start"}}>
+	<div style={{display:"flex",flexDirection:"column",gap:15,width:"100%",height:"100%",alignItems:"start",justifyContent:"space-between"}}>
 		<img src={imagesrc} style={{boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.1)",width:"100%",height:"220px",objectFit:"cover",borderRadius:"5px"}} alt="" />
 		<h2 style={{fontSize:"18px",fontWeight:"bold"}}>{label}</h2>
 		<span style={{fontSize:"16px"}}>{text}</span>
