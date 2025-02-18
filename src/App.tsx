@@ -10,6 +10,10 @@ import Delivery from "./components/Delivery/Delivery.tsx";
 import Main from "./components/Main.tsx";
 import Payment from "./components/Payment/Payment.tsx";
 import Return from "./components/Return/Return.tsx";
+import Cart from "./components/Cart/Cart.tsx";
+import Favorites from "./components/Favorites/Favorites.tsx";
+import Subcategory from "./components/Subcategory/Subcategory.tsx";
+import ProductPage from "./components/ProductPage/ProductPage.tsx";
 
 function App() {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -35,6 +39,10 @@ function App() {
 				<Route path="/catalog" element={<CabelProduct />} />
 				<Route path="/payment" element={<Payment />} />
 				<Route path="/return" element={<Return />} />
+				<Route path="/cart" element={<Cart />} />
+				<Route path="/favorites" element={<Favorites />} />
+				<Route path="/subcategory" element={<Subcategory />} />
+				<Route path="/product/:id" element={<ProductPage />} />
 			</Routes>
 			<Footer />
 		</Router>

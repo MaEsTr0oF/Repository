@@ -16,6 +16,7 @@ export default function Footer() {
               <li><Link to="/buyers">Покупателям</Link></li>
               <li><Link to="/policy">Политика конфиденциальности</Link></li>
               <li><Link to="/about">О компании</Link></li>
+              <li><Link to="/subcategory">Подкатегория</Link></li>
             </ul>
             <ul className={styles.nav_list}>
               <li><Link to="/offer">Договор публичной оферты</Link></li>

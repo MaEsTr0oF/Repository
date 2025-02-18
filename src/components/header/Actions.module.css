@@ -1,0 +1,24 @@
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: #333;
+    transition: color 0.3s ease;
+}
+
+.actions:hover {
+    color: #2a9e44;
+}
+
+.actions img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    margin-bottom: 5px;
+}
+
+.actions span {
+    font-size: 14px;
+    line-height: 130%;
+} 
