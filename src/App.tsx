@@ -4,7 +4,7 @@ import './App.css'
 import AppHeader from "./components/header/AppHeader/AppHeader.tsx"
 import SubHeader from './components/header/SubHeader'
 import Footer from './components/Footer/Footer.tsx'
-import BurgerMenu from "./components/Burger/Burger.tsx";
+import { Burger } from "./components/Burger/Burger.tsx";
 import CabelProduct from "./components/CabelProduct/CabelProduct.tsx";
 import Delivery from "./components/Delivery/Delivery.tsx";
 import Main from "./components/Main.tsx";
@@ -17,6 +17,9 @@ import ProductPage from "./components/ProductPage/ProductPage.tsx";
 import Contacts from "./components/Contacts/Contacts.tsx";
 import Buyers from "./components/Buyers/Buyers.tsx";
 import Compare from "./components/Compare/Compare.tsx";
+import About from "./components/About/About.tsx";
+import Policy from "./components/Policy/Policy.tsx";
+import Offer from "./components/Offer/Offer.tsx";
 import styles from './AppStyles.module.css';
 
 function App() {
@@ -38,7 +41,7 @@ function App() {
 				<div className={styles.pageContainer}>
 					<AppHeader />
 					{windowWidth > 1180 && <SubHeader />}
-					{windowWidth < 1180 && <BurgerMenu />}
+					{windowWidth < 1180 && <Burger />}
 					<main className={styles.mainContent}>
 						<Routes>
 							<Route path="/" element={<Main />} />
@@ -53,6 +56,9 @@ function App() {
 							<Route path="/contacts" element={<Contacts />} />
 							<Route path="/buyers" element={<Buyers />} />
 							<Route path="/compare" element={<Compare />} />
+							<Route path="/about" element={<About />} />
+							<Route path="/policy" element={<Policy />} />
+							<Route path="/offer" element={<Offer />} />
 						</Routes>
 					</main>
 					<Footer />

@@ -7,6 +7,7 @@ import MainFind from './main/MainFind/MainFind.tsx'
 import MainPluses from './main/MainPluses/MainPluses.tsx'
 import MainDelyvery from './main/MainDelyvery/MainDelyvery.tsx'
 import MainContForm from './main/MainContForm/MainContForm.tsx'
+
 export default function Main(){
 	return(
 		<main>
