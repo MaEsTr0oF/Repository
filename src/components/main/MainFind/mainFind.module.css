@@ -1,6 +1,7 @@
 .mainFind {
 	padding: 60px 0;
 	background-color: #f8f9fa;
+	width: 100%;
 }
 
 .mainFind_container {
@@ -11,6 +12,8 @@
 
 .mainFind_content {
 	text-align: center;
+	max-width: 800px;
+	margin: 0 auto;
 }
 
 .mainFind_content h2 {
