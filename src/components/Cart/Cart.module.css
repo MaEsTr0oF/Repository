@@ -329,4 +329,38 @@
         width: 100%;
         justify-content: space-between;
     }
+}
+
+.cross {
+    position: relative;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+}
+
+.cross::before,
+.cross::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 16px;
+    height: 2px;
+    background-color: #666;
+    transition: background-color 0.3s ease;
+}
+
+.cross::before {
+    transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.cross::after {
+    transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.itemDelete:hover .cross::before,
+.itemDelete:hover .cross::after,
+.deleteSelected:hover .cross::before,
+.deleteSelected:hover .cross::after {
+    background-color: #ff4444;
 } 

@@ -1,5 +1,6 @@
 import styles from './Cart.module.css';
 import { Link } from 'react-router-dom';
+import heart from '/img/header/heart.png';
 
 export default function Cart() {
     return (
@@ -44,12 +45,12 @@ export default function Cart() {
                             </div>
                             <div className={styles.itemPrice}>
                                 <span className={styles.price}>2990 ₽</span>
-                                <button className={styles.itemDelete}>
+                                
                                     <span className={styles.cross}></span>
-                                </button>
-                                <button className={styles.itemFavorite}>
-                                    <span className={styles.heart}></span>
-                                </button>
+                                
+                                
+                                    <span className={styles.heart}><img src={heart} alt="" /></span>
+                                
                             </div>
                         </div>
                     </div>
