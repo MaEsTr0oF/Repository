@@ -1,11 +1,12 @@
 import styles from './Cart.module.css';
 import { Link } from 'react-router-dom';
-import heart from '/img/header/heart.png';
 import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
+import image from '/img/header/heart.png'
+import image1 from '/img/header/heart1.png'
 
 export default function Cart() {
-    const { cartItems, removeFromCart, updateCartItemQuantity } = useShop();
+    const { cartItems, removeFromCart, updateCartItemQuantity, addToFavorite, isInFavorites } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
     const handleSelectAll = () => {
@@ -36,10 +37,20 @@ export default function Cart() {
         }
     };
 
+    const handleFavoriteClick = (item: typeof cartItems[0]) => {
+        const productToAdd = {
+            imagesrc: item.imagesrc,
+            label: item.label,
+            text: item.text,
+            cost: item.cost
+        };
+        addToFavorite(productToAdd);
+    };
+
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            const price = parseFloat(item.cost.replace(/[^\d.-]/g, ''));
-            return total + price * (item.quantity || 1);
+            const cost = parseFloat(item.cost.replace(/[^\d.-]/g, ''));
+            return total + (cost * (item.quantity || 1));
         }, 0);
     };
 
@@ -78,7 +89,10 @@ export default function Cart() {
                         {cartItems.length === 0 ? (
                             <div className={styles.emptyCart}>
                                 <h2>Корзина пуста</h2>
-                                <p>Добавьте товары из каталога</p>
+                                <p>Добавьте товары для оформления заказа</p>
+                                <Link to="/catalog" className={styles.continueShopping}>
+                                    Перейти в каталог
+                                </Link>
                             </div>
                         ) : (
                             cartItems.map(item => (
@@ -121,16 +135,16 @@ export default function Cart() {
                                             </button>
                                         </div>
                                     </div>
-                                    {/* <div className={styles.itemQuantity}>
-                                        <button className={styles.quantityBtn}>-</button>
-                                        <input type="text" value="1" readOnly />
-                                        <button className={styles.quantityBtn}>+</button>
-                                    </div> */}
                                     <div className={styles.itemPrice}>
                                         <span className={styles.price}>{item.cost} ₽</span>
-                                        <span className={styles.heart}>
-                                            <img src={heart} alt="" />
-                                        </span>
+                                        <div className={styles.itemActions}>
+                                            <img 
+                                                src={isInFavorites(item) ? image1 : image}
+                                                alt="В избранное"
+                                                onClick={() => handleFavoriteClick(item)}
+                                                className={styles.favoriteIcon}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
                             ))
@@ -140,43 +154,24 @@ export default function Cart() {
                     {cartItems.length > 0 && (
                         <div className={styles.cartSummary}>
                             <div className={styles.summaryBlock}>
-                                <h2>Итого к оплате:</h2>
-                                <div className={styles.summaryTotal}>
-                                    <span>{calculateTotal().toFixed(2)} ₽</span>
+                                <h2>Итого</h2>
+                                <div className={styles.summaryRow}>
+                                    <span>Товары ({cartItems.length})</span>
+                                    <span>{calculateTotal()} ₽</span>
                                 </div>
-                                <button className={styles.checkoutButton}>Оформить заказ</button>
+                                <button className={styles.checkoutButton}>
+                                    Оформить заказ
+                                </button>
                             </div>
 
-                            <div className={styles.deliveryBlock}>
-                                <h3>Способ доставки</h3>
-                                <div className={styles.deliveryMap}>
-                                    <div className={styles.mapPlaceholder}>
-                                        Карта пунктов выдачи СДЭК
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className={styles.paymentBlock}>
-                                <h3>Способ оплаты</h3>
-                                <div className={styles.paymentMethods}>
-                                    <label className={styles.paymentMethod}>
-                                        <input type="radio" name="payment" />
-                                        <span>Оплата картой</span>
-                                    </label>
-                                    <label className={styles.paymentMethod}>
-                                        <input type="radio" name="payment" />
-                                        <span>Оплата при получении</span>
-                                    </label>
-                                </div>
-                            </div>
-
-                            <div className={styles.contactBlock}>
-                                <h3>Контактные данные</h3>
-                                <form className={styles.contactForm}>
-                                    <input type="text" placeholder="Имя" />
-                                    <input type="tel" placeholder="Номер телефона" />
-                                    <input type="text" placeholder="Почта" />
-                                </form>
+                            <div className={styles.infoBlock}>
+                                <h3>Информация</h3>
+                                <ul>
+                                    <li>Доставка по всей России</li>
+                                    <li>Оплата при получении</li>
+                                    <li>Гарантия качества</li>
+                                    <li>Возврат в течение 14 дней</li>
+                                </ul>
                             </div>
                         </div>
                     )}

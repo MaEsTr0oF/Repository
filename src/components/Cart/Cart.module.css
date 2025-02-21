@@ -2,7 +2,11 @@
     padding: 20px 0;
     background-color: #fff;
 }
-
+.summaryRow{
+	display: flex;
+	justify-content: space-between;
+	padding: 10px;
+}
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -176,9 +180,16 @@
 }
 
 .itemPrice {
-    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.price {
     font-size: 18px;
-    margin-right: 20px;
+    font-weight: 500;
+    color: #333;
 }
 
 .itemDelete,
@@ -435,4 +446,22 @@ input[type="checkbox"]:checked + .checkbox::after {
     border: solid #2a9e44;
     border-width: 0 2px 2px 0;
     transform: rotate(45deg);
+}
+
+.favoriteIcon {
+    cursor: pointer;
+    padding: 5px;
+    width: 24px;
+    height: 24px;
+    transition: transform 0.3s ease;
+}
+
+.favoriteIcon:hover {
+    transform: scale(1.1);
+}
+
+.itemActions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
 } 

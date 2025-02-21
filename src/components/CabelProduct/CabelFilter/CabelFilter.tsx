@@ -1,6 +1,7 @@
 import styles from './CabelFilter.module.css'
 import image from '/img/header/heart.png'
 import image1 from '/img/header/stats.png'
+import image2 from '/img/header/heart1.png'
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShop } from '../../../context/ShopContext';
@@ -103,8 +104,9 @@ const products: Product[] = [
 
 const CabelFilter: React.FC = () => {
     const navigate = useNavigate();
-    const { addToCart, addToCompare } = useShop();
+    const { addToCart, addToCompare, addToFavorite, isInFavorites } = useShop();
     const [animatingProducts, setAnimatingProducts] = useState<{[key: number]: boolean}>({});
+    const [favoriteProducts, setFavoriteProducts] = useState<{[key: number]: boolean}>({});
     const [animationConfigs, setAnimationConfigs] = useState<{[key: number]: {
         startPosition: { x: number; y: number };
         endPosition: { x: number; y: number };
@@ -162,20 +164,39 @@ const CabelFilter: React.FC = () => {
         setAnimatingProducts(prev => ({ ...prev, [product.id]: true }));
 
         if (type === 'cart') {
-            addToCart({
+            const productToAdd = {
                 imagesrc: product.image,
                 label: product.title,
                 text: product.article,
-                cost: product.price.toString()
-            });
+                cost: product.price.toString(),
+                id: Date.now().toString()
+            };
+            addToCart(productToAdd);
         } else {
-            addToCompare({
+            const productToCompare = {
                 imagesrc: product.image,
                 label: product.title,
                 text: product.article,
-                cost: product.price.toString()
-            });
+                cost: product.price.toString(),
+                id: Date.now().toString()
+            };
+            addToCompare(productToCompare);
         }
+    };
+
+    const handleFavoriteClick = (e: React.MouseEvent, product: Product) => {
+        e.stopPropagation();
+        const productToAdd = {
+            imagesrc: product.image,
+            label: product.title,
+            text: product.article,
+            cost: product.price.toString()
+        };
+        addToFavorite(productToAdd);
+        setFavoriteProducts(prev => ({
+            ...prev,
+            [product.id]: !prev[product.id]
+        }));
     };
 
     return (
@@ -233,68 +254,76 @@ const CabelFilter: React.FC = () => {
                 </div>
 
                 <div className={styles.filter_cards}>
-                    {products.map((product) => (
-                        <div 
-                            key={product.id} 
-                            className={styles.card}
-                            ref={(el) => {
-                                if (el) {
-                                    cardRefs.current[product.id] = el;
-                                }
-                            }}
-                        >
-                            {product.size && (
-                                <div className={styles.size_badge}>{product.size}</div>
-                            )}
-                            <div className={styles.card_image}>
-                                <img src={product.image} alt={product.title} />
-                            </div>
-                            <div className={styles.card_title}>
-                                <h2>{product.title}</h2>
-                                <span>Артикул: {product.article}</span>
-                                <StarRating rating={product.rating} />
-                            </div>
-                            <div className={styles.card_more}>
-                                <h2>{product.price} ₽</h2>
-                                <button 
-                                    className={styles.card_more_button}
-                                    onClick={() => handleProductClick(product)}
-                                >
-                                    Подробнее
-                                </button>
-                                <button 
-                                    className={styles.card_more_button}
-                                    onClick={(e) => handleAction(e, product, 'cart')}
-                                >
-                                    В корзину
-                                </button>
-                                <div className={styles.card_more_favorive}>
-                                    <img src={image} alt="В избранное" />
-                                    <img 
-                                        src={image1} 
-                                        alt="Сравнить"
-                                        onClick={(e) => handleAction(e, product, 'compare')}
-                                        style={{ cursor: 'pointer' }}
-                                    />
+                    {products.map((product) => {
+                        const isFavorite = favoriteProducts[product.id] || false;
+                        return (
+                            <div 
+                                key={product.id} 
+                                className={styles.card}
+                                ref={(el) => {
+                                    if (el) {
+                                        cardRefs.current[product.id] = el;
+                                    }
+                                }}
+                            >
+                                {product.size && (
+                                    <div className={styles.size_badge}>{product.size}</div>
+                                )}
+                                <div className={styles.card_image}>
+                                    <img src={product.image} alt={product.title} />
                                 </div>
-                            </div>
+                                <div className={styles.card_title}>
+                                    <h2>{product.title}</h2>
+                                    <span>Артикул: {product.article}</span>
+                                    <StarRating rating={product.rating} />
+                                </div>
+                                <div className={styles.card_more}>
+                                    <h2>{product.price} ₽</h2>
+                                    <button 
+                                        className={styles.card_more_button}
+                                        onClick={() => handleProductClick(product)}
+                                    >
+                                        Подробнее
+                                    </button>
+                                    <button 
+                                        className={styles.card_more_button}
+                                        onClick={(e) => handleAction(e, product, 'cart')}
+                                    >
+                                        В корзину
+                                    </button>
+                                    <div className={styles.card_more_favorive}>
+                                        <img 
+                                            src={isFavorite ? image2 : image} 
+                                            alt="В избранное"
+                                            onClick={(e) => handleFavoriteClick(e, product)}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                        <img 
+                                            src={image1} 
+                                            alt="Сравнить"
+                                            onClick={(e) => handleAction(e, product, 'compare')}
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </div>
+                                </div>
 
-                            {animatingProducts[product.id] && animationConfigs[product.id] && (
-                                <AddToCartAnimation
-                                    startPosition={animationConfigs[product.id].startPosition}
-                                    endPosition={animationConfigs[product.id].endPosition}
-                                    imageUrl={product.image}
-                                    type={animationConfigs[product.id].type}
-                                    onComplete={() => {
-                                        setAnimatingProducts(prev => ({
-                                            ...prev,
-                                            [product.id]: false
-                                        }));
-                                    }}
-                                />
-                            )}
-                        </div>
-                    ))}
+                                {animatingProducts[product.id] && animationConfigs[product.id] && (
+                                    <AddToCartAnimation
+                                        startPosition={animationConfigs[product.id].startPosition}
+                                        endPosition={animationConfigs[product.id].endPosition}
+                                        imageUrl={product.image}
+                                        type={animationConfigs[product.id].type}
+                                        onComplete={() => {
+                                            setAnimatingProducts(prev => ({
+                                                ...prev,
+                                                [product.id]: false
+                                            }));
+                                        }}
+                                    />
+                                )}
+                            </div>
+                        );
+                    })}
                 </div>
             </div>
         </div>

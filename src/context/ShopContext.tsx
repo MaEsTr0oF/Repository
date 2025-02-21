@@ -33,9 +33,10 @@ export function ShopProvider({ children }: { children: ReactNode }) {
   const addToCart = (product: Product) => {
     setCartItems(prev => {
       const existingProduct = prev.find(item => 
+        item.imagesrc === product.imagesrc && 
         item.label === product.label && 
-        item.cost === product.cost && 
-        item.text === product.text
+        item.text === product.text &&
+        item.cost === product.cost
       );
 
       if (existingProduct) {
@@ -46,7 +47,7 @@ export function ShopProvider({ children }: { children: ReactNode }) {
         );
       }
 
-      return [...prev, { ...product, id: Date.now().toString(), quantity: 1 }];
+      return [...prev, { ...product, quantity: 1 }];
     });
   };
 
