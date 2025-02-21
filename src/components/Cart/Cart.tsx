@@ -5,7 +5,7 @@ import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
 
 export default function Cart() {
-    const { cartItems, removeFromCart } = useShop();
+    const { cartItems, removeFromCart, updateCartItemQuantity } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
     const handleSelectAll = () => {
@@ -29,10 +29,17 @@ export default function Cart() {
         setSelectedItems([]);
     };
 
+    const handleQuantityChange = (productId: string, delta: number) => {
+        const product = cartItems.find(item => item.id === productId);
+        if (product) {
+            updateCartItemQuantity(productId, (product.quantity || 1) + delta);
+        }
+    };
+
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            const cost = parseFloat(item.cost) || 0;
-            return total + cost;
+            const price = parseFloat(item.cost.replace(/[^\d.-]/g, ''));
+            return total + price * (item.quantity || 1);
         }, 0);
     };
 
@@ -70,10 +77,8 @@ export default function Cart() {
                     <div className={styles.cartItems}>
                         {cartItems.length === 0 ? (
                             <div className={styles.emptyCart}>
-                                <p>Ваша корзина пуста</p>
-                                <Link to="/catalog" className={styles.continueShopping}>
-                                    Перейти к покупкам
-                                </Link>
+                                <h2>Корзина пуста</h2>
+                                <p>Добавьте товары из каталога</p>
                             </div>
                         ) : (
                             cartItems.map(item => (
@@ -90,18 +95,39 @@ export default function Cart() {
                                     <div className={styles.itemInfo}>
                                         <h3>{item.label}</h3>
                                         <p className={styles.itemArticle}>{item.text}</p>
+                                        <div className={styles.itemControls}>
+                                            <div className={styles.quantityControls}>
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item.id!, -1)}
+                                                    disabled={item.quantity === 1}
+                                                >
+                                                    -
+                                                </button>
+                                                <span>{item.quantity || 1}</span>
+                                                <button 
+                                                    onClick={() => handleQuantityChange(item.id!, 1)}
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className={styles.itemPrice}>
+                                                {parseFloat(item.cost) * (item.quantity || 1)} ₽
+                                            </div>
+                                            <button 
+                                                className={styles.removeButton}
+                                                onClick={() => removeFromCart(item.id!)}
+                                            >
+                                                <span className={styles.cross}></span>
+                                            </button>
+                                        </div>
                                     </div>
-                                    <div className={styles.itemQuantity}>
+                                    {/* <div className={styles.itemQuantity}>
                                         <button className={styles.quantityBtn}>-</button>
                                         <input type="text" value="1" readOnly />
                                         <button className={styles.quantityBtn}>+</button>
-                                    </div>
+                                    </div> */}
                                     <div className={styles.itemPrice}>
                                         <span className={styles.price}>{item.cost} ₽</span>
-                                        <span 
-                                            className={styles.cross}
-                                            onClick={() => removeFromCart(item.id || '')}
-                                        ></span>
                                         <span className={styles.heart}>
                                             <img src={heart} alt="" />
                                         </span>

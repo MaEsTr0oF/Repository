@@ -1,7 +1,10 @@
 import styles from './CabelFilter.module.css'
 import image from '/img/header/heart.png'
 import image1 from '/img/header/stats.png'
-// import checkmark from '/img/Okey.png'
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useShop } from '../../../context/ShopContext';
+import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
 
 interface StarRatingProps {
     rating: number;
@@ -99,6 +102,82 @@ const products: Product[] = [
 ];
 
 const CabelFilter: React.FC = () => {
+    const navigate = useNavigate();
+    const { addToCart, addToCompare } = useShop();
+    const [animatingProducts, setAnimatingProducts] = useState<{[key: number]: boolean}>({});
+    const [animationConfigs, setAnimationConfigs] = useState<{[key: number]: {
+        startPosition: { x: number; y: number };
+        endPosition: { x: number; y: number };
+        type: 'cart' | 'compare';
+    }}>({});
+    const cardRefs = useRef<{[key: number]: HTMLDivElement | null}>({});
+
+    const handleProductClick = (product: Product) => {
+        navigate(`/product/${product.id}`, {
+            state: {
+                productImage: product.image,
+                title: product.title,
+                description: product.article,
+                price: product.price
+            }
+        });
+    };
+
+    const getTargetPosition = (type: 'cart' | 'compare') => {
+        const targetElement = document.querySelector(
+            type === 'cart' 
+                ? '[data-cart-icon]' 
+                : '[data-compare-icon]'
+        );
+        if (targetElement) {
+            const rect = targetElement.getBoundingClientRect();
+            return {
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2
+            };
+        }
+        return { x: 0, y: 0 };
+    };
+
+    const handleAction = (e: React.MouseEvent, product: Product, type: 'cart' | 'compare') => {
+        e.stopPropagation();
+        const cardRef = cardRefs.current[product.id];
+        if (!cardRef) return;
+
+        const rect = cardRef.getBoundingClientRect();
+        const startPosition = {
+            x: rect.left,
+            y: rect.top
+        };
+        const endPosition = getTargetPosition(type);
+
+        setAnimationConfigs(prev => ({
+            ...prev,
+            [product.id]: {
+                startPosition,
+                endPosition,
+                type
+            }
+        }));
+        setAnimatingProducts(prev => ({ ...prev, [product.id]: true }));
+
+        if (type === 'cart') {
+            addToCart({
+                imagesrc: product.image,
+                label: product.title,
+                text: product.article,
+                cost: product.price.toString()
+            });
+        } else {
+            addToCompare({
+                imagesrc: product.image,
+                label: product.title,
+                text: product.article,
+                cost: product.price.toString()
+            });
+        }
+    };
+
     return (
         <div className={styles.filter}>
             <div className={styles.breadcrumbs}>
@@ -155,7 +234,15 @@ const CabelFilter: React.FC = () => {
 
                 <div className={styles.filter_cards}>
                     {products.map((product) => (
-                        <div key={product.id} className={styles.card}>
+                        <div 
+                            key={product.id} 
+                            className={styles.card}
+                            ref={(el) => {
+                                if (el) {
+                                    cardRefs.current[product.id] = el;
+                                }
+                            }}
+                        >
                             {product.size && (
                                 <div className={styles.size_badge}>{product.size}</div>
                             )}
@@ -169,17 +256,43 @@ const CabelFilter: React.FC = () => {
                             </div>
                             <div className={styles.card_more}>
                                 <h2>{product.price} ₽</h2>
-                                <div className={styles.card_more_count}>
-                                    <span>-</span>
-                                    <span>1</span>
-                                    <span>+</span>
-                                </div>
-                                <button className={styles.card_more_button}>В корзину</button>
+                                <button 
+                                    className={styles.card_more_button}
+                                    onClick={() => handleProductClick(product)}
+                                >
+                                    Подробнее
+                                </button>
+                                <button 
+                                    className={styles.card_more_button}
+                                    onClick={(e) => handleAction(e, product, 'cart')}
+                                >
+                                    В корзину
+                                </button>
                                 <div className={styles.card_more_favorive}>
                                     <img src={image} alt="В избранное" />
-                                    <img src={image1} alt="Сравнить" />
+                                    <img 
+                                        src={image1} 
+                                        alt="Сравнить"
+                                        onClick={(e) => handleAction(e, product, 'compare')}
+                                        style={{ cursor: 'pointer' }}
+                                    />
                                 </div>
                             </div>
+
+                            {animatingProducts[product.id] && animationConfigs[product.id] && (
+                                <AddToCartAnimation
+                                    startPosition={animationConfigs[product.id].startPosition}
+                                    endPosition={animationConfigs[product.id].endPosition}
+                                    imageUrl={product.image}
+                                    type={animationConfigs[product.id].type}
+                                    onComplete={() => {
+                                        setAnimatingProducts(prev => ({
+                                            ...prev,
+                                            [product.id]: false
+                                        }));
+                                    }}
+                                />
+                            )}
                         </div>
                     ))}
                 </div>
