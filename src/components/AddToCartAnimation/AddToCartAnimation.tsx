@@ -22,7 +22,7 @@ export default function AddToCartAnimation({
     const timer = setTimeout(() => {
       setIsAnimating(false);
       onComplete();
-    }, 1000); // Длительность анимации
+    }, 3000); // Длительность анимации
 
     return () => clearTimeout(timer);
   }, [onComplete]);

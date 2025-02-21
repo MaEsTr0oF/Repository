@@ -13,7 +13,9 @@
   flex-direction: column;
   gap: 10px;
 }
-
+.buttonGroup img{
+	margin-left: 100px;
+}
 .actionButtons {
   display: flex;
   gap: 10px;

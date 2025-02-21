@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AddToCartAnimation from '../AddToCartAnimation/AddToCartAnimation';
 import styles from './ProductCard.module.css';
 import { useShop } from '../../context/ShopContext';
+import image from '/img/header/heart.png'
+import image1 from '/img/header/heart1.png'
 
 interface Props {
 	imagesrc: string;
@@ -13,7 +15,7 @@ interface Props {
 
 export default function ProductCard({imagesrc, label, text, cost}: Props) {
 	const navigate = useNavigate();
-	const { addToCart, addToCompare } = useShop();
+	const { addToCart, addToCompare, addToFavorite, isInFavorites } = useShop();
 	const cardRef = useRef<HTMLDivElement>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
 	const [animationConfig, setAnimationConfig] = useState<{
@@ -22,8 +24,16 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 		type: 'cart' | 'compare';
 	} | null>(null);
 
+	const product = { imagesrc, label, text, cost };
+	const isFavorite = isInFavorites(product);
+
 	const handleClick = () => {
 		navigate('/product/1', { state: { productImage: imagesrc, title: label, description: text, price: cost } });
+	};
+
+	const handleFavoriteClick = (e: React.MouseEvent) => {
+		e.stopPropagation();
+		addToFavorite(product);
 	};
 
 	const getTargetPosition = (type: 'cart' | 'compare') => {
@@ -60,8 +70,6 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 		});
 		setIsAnimating(true);
 
-		// Добавляем товар в корзину или список сравнения
-		const product = { imagesrc, label, text, cost };
 		if (type === 'cart') {
 			addToCart(product);
 		} else {
@@ -81,7 +89,8 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 					width: "100%",
 					height: "100%",
 					alignItems: "start",
-					justifyContent: "space-between"
+					justifyContent: "space-between",
+					position: "relative"
 				}}
 			>
 				<img 
@@ -94,6 +103,20 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 						borderRadius: "5px"
 					}} 
 					alt="" 
+					/>
+					<img 
+						src={isFavorite ? image1 : image} 
+					alt="" 
+					onClick={handleFavoriteClick}
+					style={{
+						position: "absolute",
+						right: 10,
+						top: 10,
+						cursor: "pointer",
+						padding: "5px",
+						background: "transparent",
+						transition: "background-color 0.3s ease"
+					}}
 				/>
 				<h2 style={{fontSize:"18px",fontWeight:"bold"}}>{label}</h2>
 				<span style={{fontSize:"16px"}}>{text}</span>
