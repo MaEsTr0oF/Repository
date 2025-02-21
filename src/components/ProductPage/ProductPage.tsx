@@ -1,7 +1,5 @@
 import styles from './ProductPage.module.css';
-import { Link } from 'react-router-dom';
-// import image from '/img/header/heart.png';
-// import image1 from '/img/header/stats.png';
+import { Link, useLocation } from 'react-router-dom';
 
 interface StarRatingProps {
     rating: number;
@@ -71,6 +69,9 @@ const recommendedProducts: Product[] = [
 ];
 
 export default function ProductPage() {
+    const location = useLocation();
+    const { productImage, title, description, price } = location.state || {};
+
     return (
         <div className={styles.productPage}>
             <div className={styles.container}>
@@ -79,24 +80,20 @@ export default function ProductPage() {
                     <span>/</span>
                     <Link to="/catalog">Каталог</Link>
                     <span>/</span>
-                    <Link to="/category">Категория</Link>
-                    <span>/</span>
-                    <Link to="/subcategory">Подкатегория</Link>
-                    <span>/</span>
-                    <span>Товар</span>
+                    <span>{title || 'Товар'}</span>
                 </div>
 
                 <div className={styles.productContent}>
                     <div className={styles.productImage}>
-                        <img src="/img/products/product.png" alt="Наименование товара" />
+                        <img src={productImage || "/img/products/product.png"} alt={title || "Наименование товара"} />
                     </div>
 
                     <div className={styles.productInfo}>
                         <div className={styles.brand}>Бренд</div>
-                        <h1>Наименование товара</h1>
+                        <h1>{title || "Наименование товара"}</h1>
                         <div className={styles.article}>Артикул</div>
                         <StarRating rating={4.5} />
-                        <div className={styles.price}>2990 ₽</div>
+                        <div className={styles.price}>{price ? `${price} ₽` : "2990 ₽"}</div>
 
                         <div className={styles.tabs}>
                             <button className={`${styles.tab} ${styles.active}`}>Описание</button>
@@ -104,11 +101,7 @@ export default function ProductPage() {
                         </div>
 
                         <div className={styles.description}>
-                            <p>Автоматический выключатель ВА63 серии Домовой Schneider Electric, 3-полюсный, на номинальный ток 25 А, характеристика С, номинальная отключающая способность 4500 А.</p>
-                            <p>- Автоматический выключатель Домовой обеспечивает защиту цепей от токов перегрузки и короткого замыкания.</p>
-                            <p>- Предназначен для защиты от перегрузок и коротких замыканий. Обеспечивает надежную, стабильную и безопасную работу изделия.</p>
-                            <p>- В результате чего органы зрения должны стоять, что обеспечивает дополнительную защиту.</p>
-                            <p>- Для защиты внешних линий электропередачи защищает от выхода из строя рассчитанных линий при коротких замыканиях.</p>
+                            <p>{description || "Описание товара отсутствует"}</p>
                         </div>
 
                         <div className={styles.actions}>

@@ -39,9 +39,7 @@ export default function PhoneMap() {
 				)}
 			</div>
 			<div className={styles.phoneNumber}>+7 (900) 999-99-99</div>
-			<button type="submit" className={styles.button}>
-				<span>Оставить заявку</span>
-			</button>
+
 		</div>
 	);
 }

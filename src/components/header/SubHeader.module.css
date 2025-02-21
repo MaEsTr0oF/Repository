@@ -29,6 +29,21 @@
   gap: 20px;
 }
 
+.requestButton {
+  padding: 8px 16px;
+  background-color: #2A9E44;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.requestButton:hover {
+  background-color: #238a3a;
+}
+
 @media (max-width: 768px) {
   .subHeader {
     padding: 10px;
@@ -40,5 +55,10 @@
 
   .rightSection {
     gap: 15px;
+  }
+
+  .requestButton {
+    padding: 6px 12px;
+    font-size: 13px;
   }
 }
