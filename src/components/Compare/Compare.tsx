@@ -1,55 +1,18 @@
 import styles from './Compare.module.css';
 import { Link } from 'react-router-dom';
-
-interface Product {
-    id: number;
-    title: string;
-    article: string;
-    rating: number;
-    price: number;
-    size: string;
-    image: string;
-    characteristics: {
-        [key: string]: string;
-    };
-}
-
-const products: Product[] = [
-    {
-        id: 1,
-        title: 'Силовой кабель',
-        article: '1234567890',
-        rating: 4.5,
-        price: 2990,
-        size: '160 × 38',
-        image: '/img/products/image1.png',
-        characteristics: {
-            'Сечение': '2.5 мм²',
-            'Длина': '100 м',
-            'Материал': 'Медь',
-            'Изоляция': 'ПВХ',
-            'Напряжение': '220В'
-        }
-    },
-    {
-        id: 2,
-        title: 'Кабель управления',
-        article: '1234567891',
-        rating: 4.2,
-        price: 3490,
-        size: '180 × 42',
-        image: '/img/products/image2.png',
-        characteristics: {
-            'Сечение': '1.5 мм²',
-            'Длина': '50 м',
-            'Материал': 'Медь',
-            'Изоляция': 'Резина',
-            'Напряжение': '380В'
-        }
-    }
-];
+import { useShop } from '../../context/ShopContext';
 
 export default function Compare() {
+    const { compareItems, removeFromCompare } = useShop();
+
+    const characteristics = {
+        'Сечение': '2.5 мм²',
+        'Длина': '100 м',
+        'Материал': 'Медь',
+        'Изоляция': 'ПВХ',
+        'Напряжение': '220В'
+    };
+
     return (
         <div className={styles.compare}>
             <div className={styles.container}>
@@ -62,7 +25,11 @@ export default function Compare() {
                 <div className={styles.compareHeader}>
                     <h1>Сравнение товаров</h1>
                     <div className={styles.compareActions}>
-                        <button className={styles.clearAll}>
+                        <button 
+                            className={styles.clearAll}
+                            onClick={() => compareItems.forEach(item => removeFromCompare(item.id || ''))}
+                            disabled={compareItems.length === 0}
+                        >
                             Очистить список
                         </button>
                         <div className={styles.displayToggle}>
@@ -75,55 +42,68 @@ export default function Compare() {
                 </div>
 
                 <div className={styles.compareContent}>
-                    <div className={styles.compareTable}>
-                        <div className={styles.compareColumn}>
-                            <div className={styles.columnHeader}>
-                                <h3>Характеристики</h3>
-                            </div>
-                            <div className={styles.characteristics}>
-                                {Object.keys(products[0].characteristics).map(key => (
-                                    <div key={key} className={styles.characteristicRow}>
-                                        <span>{key}</span>
-                                    </div>
-                                ))}
-                            </div>
+                    {compareItems.length === 0 ? (
+                        <div className={styles.emptyCompare}>
+                            <p>Список сравнения пуст</p>
+                            <Link to="/catalog" className={styles.continueShopping}>
+                                Перейти к покупкам
+                            </Link>
                         </div>
-
-                        {products.map(product => (
-                            <div key={product.id} className={styles.compareColumn}>
+                    ) : (
+                        <div className={styles.compareTable}>
+                            <div className={styles.compareColumn}>
                                 <div className={styles.columnHeader}>
-                                    <div className={styles.productImage}>
-                                        <img src={product.image} alt={product.title} />
-                                    </div>
-                                    <h3>{product.title}</h3>
-                                    <p className={styles.article}>Артикул: {product.article}</p>
-                                    <p className={styles.price}>{product.price} ₽</p>
-                                    <div className={styles.productActions}>
-                                        <button className={styles.addToCart}>В корзину</button>
-                                        <button className={styles.removeFromCompare}>Удалить</button>
-                                    </div>
+                                    <h3>Характеристики</h3>
                                 </div>
                                 <div className={styles.characteristics}>
-                                    {Object.entries(product.characteristics).map(([key, value]) => (
+                                    {Object.keys(characteristics).map(key => (
                                         <div key={key} className={styles.characteristicRow}>
-                                            <span>{value}</span>
+                                            <span>{key}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        ))}
 
-                        <div className={styles.compareColumn}>
-                            <div className={styles.columnHeader}>
-                                <div className={styles.addProduct}>
-                                    <button className={styles.addButton}>
-                                        <span>+</span>
-                                        <span>Добавить товар</span>
-                                    </button>
+                            {compareItems.map(item => (
+                                <div key={item.id} className={styles.compareColumn}>
+                                    <div className={styles.columnHeader}>
+                                        <div className={styles.productImage}>
+                                            <img src={item.imagesrc} alt={item.label} />
+                                        </div>
+                                        <h3>{item.label}</h3>
+                                        <p className={styles.price}>{item.cost} ₽</p>
+                                        <div className={styles.productActions}>
+                                            <button className={styles.addToCart}>В корзину</button>
+                                            <button 
+                                                className={styles.removeFromCompare}
+                                                onClick={() => removeFromCompare(item.id || '')}
+                                            >
+                                                Удалить
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div className={styles.characteristics}>
+                                        {Object.entries(characteristics).map(([key, value]) => (
+                                            <div key={key} className={styles.characteristicRow}>
+                                                <span>{value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+
+                            <div className={styles.compareColumn}>
+                                <div className={styles.columnHeader}>
+                                    <div className={styles.addProduct}>
+                                        <Link to="/catalog" className={styles.addButton}>
+                                            <span>+</span>
+                                            <span>Добавить товар</span>
+                                        </Link>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
         </div>

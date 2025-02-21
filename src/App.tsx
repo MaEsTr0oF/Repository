@@ -21,6 +21,7 @@ import About from "./components/About/About.tsx";
 import Policy from "./components/Policy/Policy.tsx";
 import Offer from "./components/Offer/Offer.tsx";
 import styles from './AppStyles.module.css';
+import { ShopProvider } from './context/ShopContext';
 
 function App() {
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
@@ -36,35 +37,37 @@ function App() {
 	}, []);
 
 	return (
-		<Router>
-			<div className={styles.pageWrapper}>
-				<div className={styles.pageContainer}>
-					<AppHeader />
-					{windowWidth > 1180 && <SubHeader />}
-					{windowWidth < 1180 && <Burger />}
-					<main className={styles.mainContent}>
-						<Routes>
-							<Route path="/" element={<Main />} />
-							<Route path="/delivery" element={<Delivery />} />
-							<Route path="/catalog" element={<CabelProduct />} />
-							<Route path="/payment" element={<Payment />} />
-							<Route path="/return" element={<Return />} />
-							<Route path="/cart" element={<Cart />} />
-							<Route path="/favorites" element={<Favorites />} />
-							<Route path="/subcategory" element={<Subcategory />} />
-							<Route path="/product/:id" element={<ProductPage />} />
-							<Route path="/contacts" element={<Contacts />} />
-							<Route path="/buyers" element={<Buyers />} />
-							<Route path="/compare" element={<Compare />} />
-							<Route path="/about" element={<About />} />
-							<Route path="/policy" element={<Policy />} />
-							<Route path="/offer" element={<Offer />} />
-						</Routes>
-					</main>
-					<Footer />
+		<ShopProvider>
+			<Router>
+				<div className={styles.pageWrapper}>
+					<div className={styles.pageContainer}>
+						<AppHeader />
+						{windowWidth > 1180 && <SubHeader />}
+						{windowWidth < 1180 && <Burger />}
+						<main className={styles.mainContent}>
+							<Routes>
+								<Route path="/" element={<Main />} />
+								<Route path="/delivery" element={<Delivery />} />
+								<Route path="/catalog" element={<CabelProduct />} />
+								<Route path="/payment" element={<Payment />} />
+								<Route path="/return" element={<Return />} />
+								<Route path="/cart" element={<Cart />} />
+								<Route path="/favorites" element={<Favorites />} />
+								<Route path="/subcategory" element={<Subcategory />} />
+								<Route path="/product/:id" element={<ProductPage />} />
+								<Route path="/contacts" element={<Contacts />} />
+								<Route path="/buyers" element={<Buyers />} />
+								<Route path="/compare" element={<Compare />} />
+								<Route path="/about" element={<About />} />
+								<Route path="/policy" element={<Policy />} />
+								<Route path="/offer" element={<Offer />} />
+							</Routes>
+						</main>
+						<Footer />
+					</div>
 				</div>
-			</div>
-		</Router>
+			</Router>
+		</ShopProvider>
 	);
 }
 
