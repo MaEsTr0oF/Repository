@@ -32,16 +32,14 @@ export function ShopProvider({ children }: { children: ReactNode }) {
 
   const addToCart = (product: Product) => {
     setCartItems(prev => {
+      const baseId = product.id?.split('_')[0];
       const existingProduct = prev.find(item => 
-        item.imagesrc === product.imagesrc && 
-        item.label === product.label && 
-        item.text === product.text &&
-        item.cost === product.cost
+        item.id?.split('_')[0] === baseId
       );
 
       if (existingProduct) {
         return prev.map(item =>
-          item.id === existingProduct.id
+          item.id?.split('_')[0] === baseId
             ? { ...item, quantity: (item.quantity || 1) + 1 }
             : item
         );

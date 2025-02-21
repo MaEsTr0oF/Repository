@@ -104,7 +104,7 @@ const products: Product[] = [
 
 const CabelFilter: React.FC = () => {
     const navigate = useNavigate();
-    const { addToCart, addToCompare, addToFavorite, isInFavorites } = useShop();
+    const { addToCart, addToCompare, addToFavorite } = useShop();
     const [animatingProducts, setAnimatingProducts] = useState<{[key: number]: boolean}>({});
     const [favoriteProducts, setFavoriteProducts] = useState<{[key: number]: boolean}>({});
     const [animationConfigs, setAnimationConfigs] = useState<{[key: number]: {
@@ -163,24 +163,18 @@ const CabelFilter: React.FC = () => {
         }));
         setAnimatingProducts(prev => ({ ...prev, [product.id]: true }));
 
+        const productToAdd = {
+            imagesrc: product.image,
+            label: product.title,
+            text: product.article,
+            cost: product.price.toString(),
+            id: `${product.id}_${Date.now()}`
+        };
+
         if (type === 'cart') {
-            const productToAdd = {
-                imagesrc: product.image,
-                label: product.title,
-                text: product.article,
-                cost: product.price.toString(),
-                id: Date.now().toString()
-            };
             addToCart(productToAdd);
         } else {
-            const productToCompare = {
-                imagesrc: product.image,
-                label: product.title,
-                text: product.article,
-                cost: product.price.toString(),
-                id: Date.now().toString()
-            };
-            addToCompare(productToCompare);
+            addToCompare(productToAdd);
         }
     };
 
