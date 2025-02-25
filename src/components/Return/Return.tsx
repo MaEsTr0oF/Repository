@@ -1,8 +1,10 @@
 import styles from './Return.module.css';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Return() {
     return (
         <div className={styles.return}>
+            <PageTitle title="Возврат товара" />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <span>Главная</span> / <span>Возврат</span>

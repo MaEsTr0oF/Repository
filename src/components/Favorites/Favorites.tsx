@@ -2,10 +2,14 @@ import styles from './Favorites.module.css';
 import { Link } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
+import ImageModal from '../ImageModal/ImageModal';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Favorites() {
     const { favorites, removeFavorite, addToCart } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     const handleSelectAll = () => {
         if (selectedItems.length === favorites.length) {
@@ -32,8 +36,15 @@ export default function Favorites() {
         addToCart(item);
     };
 
+    const handleImageClick = (e: React.MouseEvent, imageUrl: string) => {
+        e.stopPropagation();
+        setSelectedImage(imageUrl);
+        setIsImageModalOpen(true);
+    };
+
     return (
         <div className={styles.favorites}>
+            <PageTitle title="Избранное" />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <Link to="/">Главная</Link>
@@ -82,7 +93,12 @@ export default function Favorites() {
                                         onChange={() => handleSelectItem(item.id || '')}
                                     />
                                     <div className={styles.itemImage}>
-                                        <img src={item.image} alt={item.name} />
+                                        <img 
+                                            src={item.image} 
+                                            alt={item.name} 
+                                            onClick={(e) => handleImageClick(e, item.image || '')}
+                                            style={{ cursor: 'zoom-in' }}
+                                        />
                                     </div>
                                     <div className={styles.itemInfo}>
                                         <h3>{item.name}</h3>
@@ -135,6 +151,13 @@ export default function Favorites() {
                     )}
                 </div>
             </div>
+
+            <ImageModal 
+                isOpen={isImageModalOpen}
+                onClose={() => setIsImageModalOpen(false)}
+                imageUrl={selectedImage || ''}
+                altText="Изображение товара"
+            />
         </div>
     );
 } 

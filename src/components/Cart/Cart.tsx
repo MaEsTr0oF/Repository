@@ -4,6 +4,7 @@ import { useShop, FavoriteProduct } from '../../context/ShopContext';
 import { useState } from 'react';
 import image from '/img/header/heart.png'
 import image1 from '/img/header/heart1.png'
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Cart() {
     const { cartItems, removeFromCart, updateQuantity, addToFavorite, isInFavorites } = useShop();
@@ -73,6 +74,7 @@ export default function Cart() {
 
     return (
         <div className={styles.cart}>
+            <PageTitle title="Корзина" />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <Link to="/">Главная</Link>

@@ -2,6 +2,14 @@ import { Link } from 'react-router-dom';
 import styles from "./Footer.module.css"; // Импортируем стили
 
 export default function Footer() {
+  // Функция для прокрутки страницы наверх
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth' // Плавная прокрутка
+    });
+  };
+
   return (
     <footer className={styles.footer}>
       <div className={styles.footer_wrapper}>
@@ -16,7 +24,6 @@ export default function Footer() {
               <li><Link to="/buyers">Покупателям</Link></li>
               <li><Link to="/policy">Политика конфиденциальности</Link></li>
               <li><Link to="/about">О компании</Link></li>
-              <li><Link to="/subcategory">Подкатегория</Link></li>
             </ul>
             <ul className={styles.nav_list}>
               <li><Link to="/offer">Договор публичной оферты</Link></li>
@@ -31,7 +38,13 @@ export default function Footer() {
               <a href="tel:+7(999)999-999" className={styles.phone}>+7 (999) 999-999</a>
               <a href="mailto:info@mail.ru" className={styles.email}>Email: info@mail.ru</a>
             </div>
-            <button className={styles.button}>Наверх</button>
+            <button 
+              className={styles.button}
+              onClick={scrollToTop}
+              aria-label="Прокрутить страницу наверх"
+            >
+              Наверх
+            </button>
           </div>
         </div>
       </div>

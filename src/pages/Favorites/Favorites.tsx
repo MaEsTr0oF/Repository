@@ -3,6 +3,7 @@ import { useShop, FavoriteProduct } from '../../context/ShopContext';
 import styles from './Favorites.module.css';
 import AppHeader from '../../components/header/AppHeader/AppHeader';
 import Footer from '../../components/Footer/Footer';
+import PageTitle from '../../components/PageTitle/PageTitle';
 
 export default function Favorites() {
     const { favorites, addToCart, removeFavorite } = useShop();
@@ -30,6 +31,7 @@ export default function Favorites() {
     return (
         <div className={styles.favoritesPage}>
             <AppHeader />
+            <PageTitle title="Избранные товары" />
             <div className={styles.container}>
                 <h1 className={styles.title}>Избранные товары</h1>
                 

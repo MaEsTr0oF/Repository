@@ -7,10 +7,12 @@ import MainFind from './main/MainFind/MainFind.tsx'
 import MainPluses from './main/MainPluses/MainPluses.tsx'
 import MainDelyvery from './main/MainDelyvery/MainDelyvery.tsx'
 import MainContForm from './main/MainContForm/MainContForm.tsx'
+import PageTitle from './PageTitle/PageTitle.tsx'
 
 export default function Main(){
 	return(
 		<main>
+			<PageTitle title="Главная" />
 			<AppPresentation />
 			<Advantages />
 			<AppCables />

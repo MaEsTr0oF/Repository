@@ -5,6 +5,8 @@ import image from "/img/CabelCatalog/image1.png"
 import image4 from "/img/CabelCatalog/image.jpg"
 import image5 from "/img/CabelCatalog/image2.png"
 import image6 from "/img/CabelCatalog/image3.png"
+import PageTitle from "../../PageTitle/PageTitle"
+
 interface Props{
 	image:string;
 	label:string;
@@ -20,6 +22,7 @@ export default function CabelCatalog(){
 	}
 	return(
 		<div className={styles.cabel}>
+			<PageTitle title="Кабельная продукция" />
 			<h2>
 				Кабельная продукция 
 			</h2>

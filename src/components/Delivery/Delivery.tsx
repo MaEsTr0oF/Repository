@@ -1,8 +1,11 @@
 import styles from "./Delivery.module.css";
 import FooterForm from "../FooterForm/FooterForm";
+import PageTitle from "../PageTitle/PageTitle";
+
 export default function Delivery() {
   return (
     <div className={styles.delivery}>
+      <PageTitle title="Доставка" />
       <div className={styles.container}>
         <div className={styles.breadcrumbs}>
           <a href="/" className={styles.breadcrumbLink}>Главная</a>

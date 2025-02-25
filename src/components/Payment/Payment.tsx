@@ -5,10 +5,12 @@ import image2 from '/img/payment/image2.png'
 import image3 from '/img/payment/image3.png'
 import image4 from '/img/payment/image4.png'
 import image5 from '/img/payment/image5.png'
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Payment() {
     return (
         <div className={styles.payment}>
+            <PageTitle title="Оплата" />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <span>Главная</span> / <span>Оплата</span>

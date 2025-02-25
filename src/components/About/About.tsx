@@ -1,4 +1,5 @@
 import styles from './About.module.css';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function About() {
   return (
@@ -9,6 +10,7 @@ export default function About() {
         <span>О компании</span>
       </div>
 
+      <PageTitle title="О компании" />
       <h1>О компании</h1>
 
       <div className={styles.content}>

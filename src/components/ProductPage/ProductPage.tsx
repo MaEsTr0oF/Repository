@@ -3,16 +3,13 @@ import { Link, useLocation } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
 import DeliveryInfo from './DeliveryInfo';
-
-interface StarRatingProps {
-    rating: number;
-}
+import ImageModal from '../ImageModal/ImageModal';
+import PageTitle from '../PageTitle/PageTitle';
 
 interface Product {
     id: number;
     title: string;
     article: string;
-    rating: number;
     price: number;
     image: string;
 }
@@ -20,31 +17,11 @@ interface Product {
 // Типы вкладок
 type TabType = 'description' | 'delivery';
 
-const StarRating: React.FC<StarRatingProps> = ({ rating }) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    
-    return (
-        <div className={styles.starRating}>
-            {[...Array(5)].map((_, index) => {
-                if (index < fullStars) {
-                    return <span key={index} className={styles.star}>★</span>;
-                } else if (index === fullStars && hasHalfStar) {
-                    return <span key={index} className={`${styles.star} ${styles.halfStar}`}>★</span>;
-                }
-                return <span key={index} className={`${styles.star} ${styles.emptyStar}`}>★</span>;
-            })}
-            <span className={styles.ratingNumber}>({rating})</span>
-        </div>
-    );
-};
-
 const recommendedProducts: Product[] = [
     {
         id: 1,
         title: 'Силовой кабель',
         article: '1234567890',
-        rating: 4.5,
         price: 10.26,
         image: '/img/products/image1.png'
     },
@@ -52,7 +29,6 @@ const recommendedProducts: Product[] = [
         id: 2,
         title: 'Кабель управления',
         article: '1234567890',
-        rating: 4.5,
         price: 10.61,
         image: '/img/products/image2.png'
     },
@@ -60,7 +36,6 @@ const recommendedProducts: Product[] = [
         id: 3,
         title: 'Монтажный универсальный кабель',
         article: '1234567890',
-        rating: 4.5,
         price: 10.03,
         image: '/img/products/image3.png'
     },
@@ -68,7 +43,6 @@ const recommendedProducts: Product[] = [
         id: 4,
         title: 'Контрольный кабель',
         article: '1234567890',
-        rating: 4.5,
         price: 10.17,
         image: '/img/products/image4.png'
     }
@@ -76,10 +50,16 @@ const recommendedProducts: Product[] = [
 
 export default function ProductPage() {
     const location = useLocation();
-    const { productImage, title, description, price, deliveryInfo } = location.state || {};
+    const { addToCart } = useShop();
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState<TabType>('description');
-    const { addToCart } = useShop();
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    
+    // Получаем данные о товаре из state навигации или используем заглушку
+    const { title, price, productImage, description, deliveryInfo } = location.state || {};
+    
+    // Добавляем PageTitle с динамическим заголовком товара
+    const pageTitle = title ? `${title} - КабельОпт` : 'Товар - КабельОпт';
 
     const handleQuantityChange = (delta: number) => {
         const newQuantity = quantity + delta;
@@ -99,6 +79,10 @@ export default function ProductPage() {
         });
     };
 
+    const handleImageClick = () => {
+        setIsImageModalOpen(true);
+    };
+
     // Проверяем наличие данных для вкладок
     const hasDescription = !!description;
     // Всегда показываем вкладку доставки, так как у нас есть стандартная информация
@@ -111,6 +95,7 @@ export default function ProductPage() {
 
     return (
         <div className={styles.productPage}>
+            <PageTitle title={pageTitle} />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <Link to="/">Главная</Link>
@@ -122,14 +107,18 @@ export default function ProductPage() {
 
                 <div className={styles.productContent}>
                     <div className={styles.productImage}>
-                        <img src={productImage || "/img/products/product.png"} alt={title || "Наименование товара"} />
+                        <img 
+                            src={productImage || "/img/products/product.png"} 
+                            alt={title || "Наименование товара"} 
+                            onClick={handleImageClick}
+                            style={{ cursor: 'zoom-in' }}
+                        />
                     </div>
 
                     <div className={styles.productInfo}>
                         <div className={styles.brand}>Бренд</div>
                         <h1>{title || "Наименование товара"}</h1>
                         <div className={styles.article}>Артикул</div>
-                        <StarRating rating={4.5} />
                         <div className={styles.price}>{price ? `${price} ₽` : "2990 ₽"}</div>
 
                         {/* Отображаем вкладки только если есть данные хотя бы для одной из них */}
@@ -231,6 +220,14 @@ export default function ProductPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Модальное окно для отображения изображения на весь экран */}
+            <ImageModal 
+                isOpen={isImageModalOpen}
+                onClose={() => setIsImageModalOpen(false)}
+                imageUrl={productImage || "/img/products/product.png"}
+                altText={title || "Наименование товара"}
+            />
         </div>
     );
 } 

@@ -1,4 +1,5 @@
 import styles from './Policy.module.css';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Policy() {
   return (
@@ -9,6 +10,7 @@ export default function Policy() {
         <span>Политика конфиденциальности</span>
       </div>
 
+      <PageTitle title="Политика конфиденциальности" />
       <h1>Политика конфиденциальности</h1>
 
       <div className={styles.content}>

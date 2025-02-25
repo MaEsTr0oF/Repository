@@ -2,15 +2,12 @@ import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useShop, Product as ShopProduct, SortType } from '../../../context/ShopContext';
 import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
+import ImageModal from '../../ImageModal/ImageModal';
 import styles from "./CabelFilter.module.css";
 import image from '/img/header/heart.png';
 import image1 from '/img/header/heart1.png';
 import filterIcon from '/img/header/stats.png';
 import closeIcon from '/img/header/card.png';
-
-interface StarRatingProps {
-    rating: number;
-}
 
 interface Manufacturer {
     id: string;
@@ -35,25 +32,6 @@ const manufacturers: Manufacturer[] = [
     { id: 'spetskoelstroi', name: 'Спецкабельстрой' },
     { id: 'kabelmoscow', name: 'Кабель Москва' },
 ];
-
-const StarRating: React.FC<StarRatingProps> = ({ rating }) => {
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-    
-    return (
-        <div className={styles.starRating}>
-            {[...Array(5)].map((_, index) => {
-                if (index < fullStars) {
-                    return <span key={index} className={styles.star}>★</span>;
-                } else if (index === fullStars && hasHalfStar) {
-                    return <span key={index} className={`${styles.star} ${styles.halfStar}`}>★</span>;
-                }
-                return <span key={index} className={`${styles.star} ${styles.emptyStar}`}>★</span>;
-            })}
-            <span className={styles.ratingNumber}>({rating})</span>
-        </div>
-    );
-};
 
 const CabelFilter: React.FC = () => {
     const navigate = useNavigate();
@@ -83,6 +61,8 @@ const CabelFilter: React.FC = () => {
     const [searchValue, setSearchValue] = useState<string>('');
     const cardRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     // Обновляем поисковый запрос при вводе
     useEffect(() => {
@@ -197,6 +177,12 @@ const CabelFilter: React.FC = () => {
         });
     };
 
+    const handleImageClick = (e: React.MouseEvent, imageUrl: string) => {
+        e.stopPropagation();
+        setSelectedImage(imageUrl);
+        setIsImageModalOpen(true);
+    };
+
     // Преобразуем отфильтрованные продукты в формат для отображения
     const products: Product[] = filteredProducts.map((product) => {
         // Убираем символ рубля из строки cost, если он там есть
@@ -211,7 +197,6 @@ const CabelFilter: React.FC = () => {
             cost: costValue,
             image: product.image || '',
             article: product.article || '',
-            rating: product.rating || 4.0,
             size: product.size || ''
         };
     });
@@ -244,7 +229,6 @@ const CabelFilter: React.FC = () => {
                             <option value="price-desc">Сначала дороже</option>
                             <option value="name-asc">От А до Я</option>
                             <option value="name-desc">От Я до А</option>
-                            <option value="rating-desc">По рейтингу</option>
                         </select>
                     </div>
                     
@@ -348,12 +332,17 @@ const CabelFilter: React.FC = () => {
                                     {product.size && (
                                         <div className={styles.size_badge}>{product.size}</div>
                                     )}
-                                    <div 
-                                        className={styles.card_image} 
-                                        onClick={() => handleProductClick(product)}
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <img src={product.image} alt={product.name || product.title} />
+                                    <div className={styles.card_image}>
+                                        <img 
+                                            src={product.image} 
+                                            alt={product.name || product.title} 
+                                            onClick={(e) => handleImageClick(e, product.image || '')}
+                                            style={{ cursor: 'zoom-in' }}
+                                        />
+                                        <div 
+                                            className={styles.productOverlay}
+                                            onClick={() => handleProductClick(product)}
+                                        ></div>
                                     </div>
                                     <div 
                                         className={styles.card_title} 
@@ -362,7 +351,6 @@ const CabelFilter: React.FC = () => {
                                     >
                                         <h2>{product.name || product.title}</h2>
                                         <span>Артикул: {product.article || product.text}</span>
-                                        <StarRating rating={product.rating || 4} />
                                     </div>
                                     <div className={styles.card_more}>
                                         <h2>{product.cost} ₽</h2>
@@ -417,6 +405,14 @@ const CabelFilter: React.FC = () => {
                     )}
                 </div>
             </div>
+            
+            {/* Модальное окно для отображения изображения на весь экран */}
+            <ImageModal 
+                isOpen={isImageModalOpen}
+                onClose={() => setIsImageModalOpen(false)}
+                imageUrl={selectedImage || ''}
+                altText="Изображение товара"
+            />
         </div>
     );
 };

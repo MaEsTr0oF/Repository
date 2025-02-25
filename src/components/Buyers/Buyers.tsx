@@ -1,5 +1,6 @@
 import styles from './Buyers.module.css';
 import { Link } from 'react-router-dom';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Buyers() {
     return (
@@ -11,6 +12,7 @@ export default function Buyers() {
                     <span>Покупателям</span>
                 </div>
 
+                <PageTitle title="Информация для покупателей" />
                 <h1 className={styles.title}>Информация для покупателей</h1>
 
                 <div className={styles.buyersContent}>

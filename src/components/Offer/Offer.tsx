@@ -1,4 +1,5 @@
 import styles from './Offer.module.css';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Offer() {
   return (
@@ -9,6 +10,7 @@ export default function Offer() {
         <span>Договор публичной оферты</span>
       </div>
 
+      <PageTitle title="Договор публичной оферты" />
       <h1>Договор публичной оферты</h1>
 
       <div className={styles.content}>

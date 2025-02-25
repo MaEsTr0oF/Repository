@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import styles from './Compare.module.css';
 import { Link } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
+import ImageModal from '../ImageModal/ImageModal';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Compare() {
     const { compareItems, removeFromCompare } = useShop();
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     const characteristics = {
         'Сечение': '2.5 мм²',
@@ -13,8 +18,14 @@ export default function Compare() {
         'Напряжение': '220В'
     };
 
+    const handleImageClick = (imageUrl: string) => {
+        setSelectedImage(imageUrl);
+        setIsImageModalOpen(true);
+    };
+
     return (
         <div className={styles.compare}>
+            <PageTitle title="Сравнение товаров" />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
                     <Link to="/">Главная</Link>
@@ -68,7 +79,12 @@ export default function Compare() {
                                 <div key={item.id} className={styles.compareColumn}>
                                     <div className={styles.columnHeader}>
                                         <div className={styles.productImage}>
-                                            <img src={item.image} alt={item.name} />
+                                            <img 
+                                                src={item.image} 
+                                                alt={item.name} 
+                                                onClick={() => handleImageClick(item.image || '')}
+                                                style={{ cursor: 'zoom-in' }}
+                                            />
                                         </div>
                                         <h3>{item.name}</h3>
                                         <p className={styles.price}>{item.cost}</p>
@@ -106,6 +122,14 @@ export default function Compare() {
                     )}
                 </div>
             </div>
+
+            {/* Модальное окно для отображения изображения на весь экран */}
+            <ImageModal 
+                isOpen={isImageModalOpen}
+                onClose={() => setIsImageModalOpen(false)}
+                imageUrl={selectedImage || ''}
+                altText="Изображение товара"
+            />
         </div>
     );
 } 

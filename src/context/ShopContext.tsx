@@ -10,7 +10,6 @@ export interface Product {
     image?: string;
     manufacturer?: string;
     category?: string;
-    rating?: number;
     article?: string;
     size?: string;
     text?: string;
@@ -29,7 +28,7 @@ export interface FilterOptions {
     sortType?: SortType;
 }
 
-export type SortType = 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc' | 'rating-desc' | '';
+export type SortType = 'price-asc' | 'price-desc' | 'name-asc' | 'name-desc' | '';
 
 export interface ShopContextType {
     cartItems: Product[];
@@ -77,8 +76,7 @@ const demoProducts: Product[] = [
         cost: "10.26 ₽",
         manufacturer: "Камкабель",
         category: "power",
-        image: "/img/Cables/image1.jpg",
-        rating: 4.2
+        image: "/img/Cables/image1.jpg"
     },
     {
         id: "cable10",
@@ -86,8 +84,7 @@ const demoProducts: Product[] = [
         cost: "10.61 ₽",
         manufacturer: "Uncomtech",
         category: "control",
-        image: "/img/Cables/image12.jpg",
-        rating: 4.5
+        image: "/img/Cables/image12.jpg"
     },
     {
         id: "cable11",
@@ -95,8 +92,7 @@ const demoProducts: Product[] = [
         cost: "10.03 ₽",
         manufacturer: "Спецкабельстрой",
         category: "universal",
-        image: "/img/Cables/image-4.jpg",
-        rating: 3.8
+        image: "/img/Cables/image-4.jpg"
     },
     {
         id: "cable12",
@@ -104,8 +100,7 @@ const demoProducts: Product[] = [
         cost: "10.17 ₽",
         manufacturer: "Кабель Москва",
         category: "control",
-        image: "/img/Cables/image-7.jpg",
-        rating: 4.1
+        image: "/img/Cables/image-7.jpg"
     },
     {
         id: "cable13",
@@ -113,8 +108,7 @@ const demoProducts: Product[] = [
         cost: "10.11 ₽",
         manufacturer: "Камкабель",
         category: "signal",
-        image: "/img/Cables/image.jpg",
-        rating: 4.3
+        image: "/img/Cables/image.jpg"
     },
     {
         id: "cable14",
@@ -122,8 +116,7 @@ const demoProducts: Product[] = [
         cost: "0 ₽",
         manufacturer: "Uncomtech",
         category: "optical",
-        image: "/img/Cables/image-2.jpg",
-        rating: 4.7
+        image: "/img/Cables/image-2.jpg"
     },
     {
         id: "cable15",
@@ -131,8 +124,7 @@ const demoProducts: Product[] = [
         cost: "10.2 ₽",
         manufacturer: "Спецкабельстрой",
         category: "marine",
-        image: "/img/Cables/image-5.jpg",
-        rating: 3.9
+        image: "/img/Cables/image-5.jpg"
     },
     {
         id: "cable16",
@@ -140,8 +132,7 @@ const demoProducts: Product[] = [
         cost: "10.21 ₽",
         manufacturer: "Кабель Москва",
         category: "symmetric",
-        image: "/img/Cables/image-8.jpg",
-        rating: 4.4
+        image: "/img/Cables/image-8.jpg"
     },
     {
         id: "cable17",
@@ -149,8 +140,7 @@ const demoProducts: Product[] = [
         cost: "10.53 ₽",
         manufacturer: "Камкабель",
         category: "local",
-        image: "/img/Cables/image-1.jpg",
-        rating: 4.2
+        image: "/img/Cables/image-1.jpg"
     },
     {
         id: "cable18",
@@ -158,8 +148,7 @@ const demoProducts: Product[] = [
         cost: "11.32 ₽",
         manufacturer: "Uncomtech",
         category: "phone",
-        image: "/img/Cables/image-3.jpg",
-        rating: 4.0
+        image: "/img/Cables/image-3.jpg"
     },
     {
         id: "cable19",
@@ -167,8 +156,7 @@ const demoProducts: Product[] = [
         cost: "10.37 ₽",
         manufacturer: "Спецкабельстрой",
         category: "coaxial",
-        image: "/img/Cables/image-6.jpg",
-        rating: 4.6
+        image: "/img/Cables/image-6.jpg"
     },
     {
         id: "cable20",
@@ -176,8 +164,7 @@ const demoProducts: Product[] = [
         cost: "14.4 ₽",
         manufacturer: "Кабель Москва",
         category: "polymer",
-        image: "/img/Cables/image-9.jpg",
-        rating: 4.3
+        image: "/img/Cables/image-9.jpg"
     },
     {
         id: "cable21",
@@ -185,8 +172,7 @@ const demoProducts: Product[] = [
         cost: "10.1 ₽",
         manufacturer: "Камкабель",
         category: "lan",
-        image: "/img/Cables/image-10.jpg",
-        rating: 4.5
+        image: "/img/Cables/image-10.jpg"
     },
     {
         id: "cable22",
@@ -194,8 +180,7 @@ const demoProducts: Product[] = [
         cost: "10.03 ₽",
         manufacturer: "Uncomtech",
         category: "wire",
-        image: "/img/Cables/image-11.jpg",
-        rating: 4.1
+        image: "/img/Cables/image-11.jpg"
     }
 ];
 
@@ -283,9 +268,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 case 'name-desc':
                     filtered.sort((a, b) => b.name.localeCompare(a.name));
                     break;
-                case 'rating-desc':
-                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                    break;
             }
         }
         
@@ -316,7 +298,31 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     
     // Сортировка товаров
     const sortProducts = (sortType: SortType) => {
-        setFilterOptions(prev => ({ ...prev, sortType }));
+        setFilterOptions(prev => ({
+            ...prev,
+            sortType
+        }));
+
+        const filtered = [...filteredProducts];
+
+        switch (sortType) {
+            case 'price-asc':
+                filtered.sort((a, b) => parseFloat(a.cost.replace(/[^\d.,]/g, '').replace(',', '.')) - parseFloat(b.cost.replace(/[^\d.,]/g, '').replace(',', '.')));
+                break;
+            case 'price-desc':
+                filtered.sort((a, b) => parseFloat(b.cost.replace(/[^\d.,]/g, '').replace(',', '.')) - parseFloat(a.cost.replace(/[^\d.,]/g, '').replace(',', '.')));
+                break;
+            case 'name-asc':
+                filtered.sort((a, b) => a.name.localeCompare(b.name));
+                break;
+            case 'name-desc':
+                filtered.sort((a, b) => b.name.localeCompare(a.name));
+                break;
+            default:
+                break;
+        }
+
+        setFilteredProducts(filtered);
     };
     
     // Применяем фильтры при изменении опций фильтрации

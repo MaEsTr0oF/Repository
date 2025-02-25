@@ -1,5 +1,6 @@
 import styles from './Contacts.module.css';
 import { Link } from 'react-router-dom';
+import PageTitle from '../PageTitle/PageTitle';
 
 export default function Contacts() {
     return (
@@ -11,6 +12,7 @@ export default function Contacts() {
                     <span>Контакты</span>
                 </div>
 
+                <PageTitle title="Контакты" />
                 <h1 className={styles.title}>Контакты</h1>
 
                 <div className={styles.contactsContent}>
