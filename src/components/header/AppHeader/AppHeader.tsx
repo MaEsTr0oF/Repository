@@ -5,12 +5,18 @@ import card from '/img/header/card.png'
 import Actions from '../Actions'
 import styles from "./header.module.css";
 import PhoneMap from '../PhoneMap/PhoneMap'
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from 'react-router-dom';
+import { useShop, Product } from '../../../context/ShopContext';
 
 export default function Header() {
 	const navigate = useNavigate();
+	const { searchProducts, demoProducts } = useShop();
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+	const [searchValue, setSearchValue] = useState('');
+	const [showResults, setShowResults] = useState(false);
+	const [searchResults, setSearchResults] = useState<Product[]>([]);
+	const searchRef = useRef<HTMLDivElement>(null);
 	
 	useEffect(() => {
 		function handleResize() {
@@ -22,8 +28,75 @@ export default function Header() {
 		};
 	}, []);
 
+	// Закрывать результаты поиска при клике вне компонента
+	useEffect(() => {
+		function handleClickOutside(event: MouseEvent) {
+			if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+				setShowResults(false);
+			}
+		}
+		document.addEventListener("mousedown", handleClickOutside);
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside);
+		};
+	}, [searchRef]);
+
+	// Фильтрация товаров при вводе текста
+	useEffect(() => {
+		if (searchValue.trim() === '') {
+			setSearchResults([]);
+			setShowResults(false);
+			return;
+		}
+		
+		// Установим showResults в true когда есть текст для поиска
+		setShowResults(true);
+		
+		// Проверим, существует ли demoProducts
+		if (!demoProducts || !Array.isArray(demoProducts)) {
+			console.error('demoProducts не найден или не является массивом', demoProducts);
+			return;
+		}
+		
+		try {
+			const results = demoProducts.filter(product => 
+				product.name.toLowerCase().includes(searchValue.toLowerCase())
+			);
+			setSearchResults(results.slice(0, 5)); // Максимум 5 результатов
+			
+			// Отладочное сообщение
+			console.log('Найдено результатов:', results.length);
+		} catch (error) {
+			console.error('Ошибка при фильтрации товаров:', error);
+		}
+	}, [searchValue, demoProducts]);
+
 	const handleCatalogClick = () => {
 		navigate('/catalog');
+	};
+
+	const handleSearch = (e: React.FormEvent) => {
+		e.preventDefault();
+		searchProducts(searchValue);
+		setShowResults(false);
+		navigate('/catalog');
+	};
+
+	const handleSearchFocus = () => {
+		if (searchValue.trim() !== '') {
+			setShowResults(true);
+		}
+	};
+	
+	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setSearchValue(value);
+	};
+
+	const handleProductSelect = (product: Product) => {
+		setSearchValue(product.name);
+		setShowResults(false);
+		navigate(`/product/${product.id}`);
 	};
 
 	return(
@@ -41,11 +114,53 @@ export default function Header() {
 								Каталог
 							</button>
 						</div>
-						<div className={styles.header_search}>
-							<input type="text" placeholder='Поиск по товарам'/>
-							<button type='submit'>
-								<img src={search} alt="поиск" />
-							</button>
+						<div className={styles.header_search_container} ref={searchRef}>
+							<form className={styles.header_search} onSubmit={handleSearch}>
+								<input 
+									type="text" 
+									placeholder='Поиск по товарам'
+									value={searchValue}
+									onChange={handleSearchInputChange}
+									onFocus={handleSearchFocus}
+								/>
+								<button type='submit'>
+									<img src={search} alt="поиск" />
+								</button>
+							</form>
+							{showResults && (
+								<div className={styles.search_results}>
+									{searchResults.length > 0 ? (
+										<>
+											{searchResults.map((product) => (
+												<div 
+													key={product.id} 
+													className={styles.search_result_item}
+													onClick={() => handleProductSelect(product)}
+												>
+													<div className={styles.result_item_image}>
+														{product.image && (
+															<img src={product.image} alt={product.name} />
+														)}
+													</div>
+													<div className={styles.result_item_info}>
+														<div className={styles.result_item_name}>{product.name}</div>
+														<div className={styles.result_item_price}>{product.cost}</div>
+													</div>
+												</div>
+											))}
+											<div className={styles.search_all_results} onClick={handleSearch}>
+												Показать все результаты
+											</div>
+										</>
+									) : (
+										<div className={styles.search_result_item}>
+											<div className={styles.result_item_info}>
+												<div className={styles.result_item_name}>Ничего не найдено</div>
+											</div>
+										</div>
+									)}
+								</div>
+							)}
 						</div>
 					</div>
 					<div className={styles.header_actions}>
