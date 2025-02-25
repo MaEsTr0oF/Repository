@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import styles from './FooterForm.module.css'
 import Modal from '../Modal/Modal';
 
@@ -17,7 +17,7 @@ export default function FooterForm() {
 		setFormData({
 			name: '',
 			phone: '',
-			email: ''
+			message: ''
 		});
 	};
 
