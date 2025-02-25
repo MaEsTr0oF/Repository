@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import styles from "./AppPresentation.module.css"
 export default function AppPresentatio(){
 	return(
@@ -14,7 +15,7 @@ export default function AppPresentatio(){
 							<span>Качество, подтверждённое ГОСТ</span>
 						</div>
 						<div className={styles.presentation_button}>
-							<button>Узнать цену</button>
+							<Link to="/catalog"><button>Узнать цену</button></Link>
 						</div>
 					</div>
 				</div>

@@ -11,6 +11,9 @@ export interface Product {
     manufacturer?: string;
     category?: string;
     rating?: number;
+    article?: string;
+    size?: string;
+    text?: string;
 }
 
 export interface FavoriteProduct extends Product {
@@ -41,7 +44,7 @@ export interface ShopContextType {
     favorites: FavoriteProduct[];
     addToFavorite: (product: FavoriteProduct) => void;
     removeFavorite: (id: string) => void;
-    isInFavorites: (id: string) => boolean;
+    isInFavorites: (idOrProduct: string | Product | FavoriteProduct) => boolean;
     clearFavorites: () => void;
     filteredProducts: Product[];
     searchProducts: (query: string) => void;
@@ -321,59 +324,87 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
         applyFilters();
     }, [filterOptions]);
     
-    // Загрузка корзины из localStorage при инициализации
+    // Загрузка данных из localStorage при инициализации
     useEffect(() => {
-        const savedCart = localStorage.getItem('cart');
-        if (savedCart) {
-            try {
-                setCartItems(JSON.parse(savedCart));
-            } catch (error) {
-                console.error('Error loading cart from localStorage:', error);
-                setCartItems([]);
+        try {
+            // Загрузка корзины
+            const savedCart = localStorage.getItem('cart');
+            if (savedCart) {
+                const parsedCart = JSON.parse(savedCart);
+                if (Array.isArray(parsedCart)) {
+                    setCartItems(parsedCart);
+                    console.log('Корзина загружена из localStorage:', parsedCart);
+                }
             }
-        }
-        
-        const savedCompare = localStorage.getItem('compare');
-        if (savedCompare) {
-            try {
-                setCompareItems(JSON.parse(savedCompare));
-            } catch (error) {
-                console.error('Error loading compare items from localStorage:', error);
-                setCompareItems([]);
+            
+            // Загрузка списка сравнения
+            const savedCompare = localStorage.getItem('compare');
+            if (savedCompare) {
+                const parsedCompare = JSON.parse(savedCompare);
+                if (Array.isArray(parsedCompare)) {
+                    setCompareItems(parsedCompare);
+                    console.log('Список сравнения загружен из localStorage:', parsedCompare);
+                }
             }
-        }
-        
-        const savedFavorites = localStorage.getItem('favorites');
-        if (savedFavorites) {
-            try {
-                setFavorites(JSON.parse(savedFavorites));
-            } catch (error) {
-                console.error('Error loading favorites from localStorage:', error);
-                setFavorites([]);
+            
+            // Загрузка избранного
+            const savedFavorites = localStorage.getItem('favorites');
+            if (savedFavorites) {
+                const parsedFavorites = JSON.parse(savedFavorites);
+                if (Array.isArray(parsedFavorites)) {
+                    setFavorites(parsedFavorites);
+                    console.log('Избранное загружено из localStorage:', parsedFavorites);
+                }
             }
+        } catch (error) {
+            console.error('Ошибка при загрузке данных из localStorage:', error);
         }
     }, []);
     
     // Сохранение корзины в localStorage при изменении
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(cartItems));
+        try {
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            console.log('Корзина сохранена в localStorage:', cartItems);
+        } catch (error) {
+            console.error('Ошибка при сохранении корзины в localStorage:', error);
+        }
     }, [cartItems]);
     
     // Сохранение списка сравнения в localStorage при изменении
     useEffect(() => {
-        localStorage.setItem('compare', JSON.stringify(compareItems));
+        try {
+            localStorage.setItem('compare', JSON.stringify(compareItems));
+            console.log('Список сравнения сохранен в localStorage:', compareItems);
+        } catch (error) {
+            console.error('Ошибка при сохранении списка сравнения в localStorage:', error);
+        }
     }, [compareItems]);
     
     // Сохранение избранного в localStorage при изменении
     useEffect(() => {
-        localStorage.setItem('favorites', JSON.stringify(favorites));
+        try {
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+            console.log('Избранное сохранено в localStorage:', favorites);
+        } catch (error) {
+            console.error('Ошибка при сохранении избранного в localStorage:', error);
+        }
     }, [favorites]);
     
     // Функция для добавления товара в корзину
     const addToCart = (product: Product) => {
-        // Проверка, существует ли уже такой товар (с таким же baseId) в корзине
-        if (product.baseId) {
-            const existingProductIndex = cartItems.findIndex(item => item.baseId === product.baseId);
+        try {
+            if (!product || !product.id) {
+                console.error('Попытка добавить некорректный товар в корзину:', product);
+                return;
+            }
+
+            // Проверяем, существует ли уже такой товар в корзине по id или baseId
+            const existingProductIndex = cartItems.findIndex(item => 
+                (product.baseId && item.baseId === product.baseId) || 
+                (item.id === product.id) ||
+                (item.name === product.name && item.cost === product.cost)
+            );
             
             if (existingProductIndex !== -1) {
                 // Если товар уже есть, обновляем его количество
@@ -386,75 +417,153 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 setCartItems(updatedCart);
             } else {
                 // Если товара еще нет, добавляем его
-                setCartItems([...cartItems, { ...product, quantity: product.quantity || 1 }]);
+                setCartItems(prevItems => [...prevItems, { ...product, quantity: product.quantity || 1 }]);
             }
-        } else {
-            // Если нет baseId, просто добавляем товар
-            setCartItems([...cartItems, { ...product, quantity: product.quantity || 1 }]);
+        } catch (error) {
+            console.error('Ошибка при добавлении товара в корзину:', error);
         }
     };
     
     // Функция для удаления товара из корзины
     const removeFromCart = (id: string) => {
-        setCartItems(cartItems.filter(item => item.id !== id));
+        try {
+            if (!id) {
+                console.error('Попытка удалить товар с некорректным id:', id);
+                return;
+            }
+            setCartItems(prevItems => prevItems.filter(item => item.id !== id));
+        } catch (error) {
+            console.error('Ошибка при удалении товара из корзины:', error);
+        }
     };
     
     // Функция для обновления количества товара в корзине
     const updateQuantity = (id: string, quantity: number) => {
-        setCartItems(
-            cartItems.map(item => 
-                item.id === id ? { ...item, quantity } : item
-            )
-        );
+        try {
+            if (!id) {
+                console.error('Попытка обновить количество товара с некорректным id:', id);
+                return;
+            }
+
+            if (quantity <= 0) {
+                // Если количество меньше или равно 0, удаляем товар из корзины
+                removeFromCart(id);
+                return;
+            }
+            
+            setCartItems(prevItems =>
+                prevItems.map(item => 
+                    item.id === id ? { ...item, quantity } : item
+                )
+            );
+        } catch (error) {
+            console.error('Ошибка при обновлении количества товара:', error);
+        }
     };
     
     // Функция для очистки корзины
     const clearCart = () => {
-        setCartItems([]);
+        try {
+            setCartItems([]);
+        } catch (error) {
+            console.error('Ошибка при очистке корзины:', error);
+        }
     };
     
     // Функция для добавления товара в список сравнения
     const addToCompare = (product: Product) => {
-        // Проверка, существует ли уже такой товар в списке сравнения
-        if (!compareItems.some(item => item.id === product.id)) {
-            setCompareItems([...compareItems, product]);
+        try {
+            if (!product || !product.id) {
+                console.error('Попытка добавить некорректный товар в список сравнения:', product);
+                return;
+            }
+
+            // Проверка, существует ли уже такой товар в списке сравнения
+            if (!compareItems.some(item => item.id === product.id)) {
+                setCompareItems(prevItems => [...prevItems, product]);
+            }
+        } catch (error) {
+            console.error('Ошибка при добавлении товара в список сравнения:', error);
         }
     };
     
     // Функция для удаления товара из списка сравнения
     const removeFromCompare = (id: string) => {
-        setCompareItems(compareItems.filter(item => item.id !== id));
+        try {
+            if (!id) {
+                console.error('Попытка удалить товар с некорректным id из списка сравнения:', id);
+                return;
+            }
+            setCompareItems(prevItems => prevItems.filter(item => item.id !== id));
+        } catch (error) {
+            console.error('Ошибка при удалении товара из списка сравнения:', error);
+        }
     };
     
     // Функция для очистки списка сравнения
     const clearCompare = () => {
-        setCompareItems([]);
+        try {
+            setCompareItems([]);
+        } catch (error) {
+            console.error('Ошибка при очистке списка сравнения:', error);
+        }
     };
     
     // Функция для добавления товара в избранное
     const addToFavorite = (product: FavoriteProduct) => {
-        // Проверка, существует ли уже такой товар в избранном
-        if (!isInFavorites(product.id)) {
-            setFavorites([...favorites, product]);
-        } else {
-            // Если товар уже в избранном, удаляем его
-            removeFavorite(product.id);
+        try {
+            if (!product || !product.id) {
+                console.error('Попытка добавить некорректный товар в избранное:', product);
+                return;
+            }
+
+            // Проверка, существует ли уже такой товар в избранном
+            if (!isInFavorites(product.id)) {
+                setFavorites(prevItems => [...prevItems, product]);
+            } else {
+                // Если товар уже в избранном, удаляем его
+                removeFavorite(product.id);
+            }
+        } catch (error) {
+            console.error('Ошибка при добавлении товара в избранное:', error);
         }
     };
     
     // Функция для проверки, находится ли товар в избранном
-    const isInFavorites = (id: string): boolean => {
-        return favorites.some(item => item.id === id);
+    const isInFavorites = (idOrProduct: string | Product | FavoriteProduct): boolean => {
+        try {
+            if (typeof idOrProduct === 'string') {
+                return favorites.some(item => item.id === idOrProduct);
+            } else if (idOrProduct && idOrProduct.id) {
+                return favorites.some(item => item.id === idOrProduct.id);
+            }
+            return false;
+        } catch (error) {
+            console.error('Ошибка при проверке наличия товара в избранном:', error);
+            return false;
+        }
     };
     
     // Функция для удаления товара из избранного
     const removeFavorite = (id: string) => {
-        setFavorites(favorites.filter(item => item.id !== id));
+        try {
+            if (!id) {
+                console.error('Попытка удалить товар с некорректным id из избранного:', id);
+                return;
+            }
+            setFavorites(prevItems => prevItems.filter(item => item.id !== id));
+        } catch (error) {
+            console.error('Ошибка при удалении товара из избранного:', error);
+        }
     };
     
     // Функция для очистки избранного
     const clearFavorites = () => {
-        setFavorites([]);
+        try {
+            setFavorites([]);
+        } catch (error) {
+            console.error('Ошибка при очистке избранного:', error);
+        }
     };
     
     // Предоставляем контекст

@@ -68,10 +68,10 @@ export default function Compare() {
                                 <div key={item.id} className={styles.compareColumn}>
                                     <div className={styles.columnHeader}>
                                         <div className={styles.productImage}>
-                                            <img src={item.imagesrc} alt={item.label} />
+                                            <img src={item.image} alt={item.name} />
                                         </div>
-                                        <h3>{item.label}</h3>
-                                        <p className={styles.price}>{item.cost} ₽</p>
+                                        <h3>{item.name}</h3>
+                                        <p className={styles.price}>{item.cost}</p>
                                         <div className={styles.productActions}>
                                             <button className={styles.addToCart}>В корзину</button>
                                             <button 

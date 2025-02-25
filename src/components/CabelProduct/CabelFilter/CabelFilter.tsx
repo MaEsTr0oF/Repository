@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useShop, Product as ShopProduct } from '../../../context/ShopContext';
+import { useShop, Product as ShopProduct, SortType } from '../../../context/ShopContext';
 import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
 import styles from "./CabelFilter.module.css";
 import image from '/img/header/heart.png';
@@ -26,15 +26,6 @@ interface Product extends ShopProduct {
     imagesrc?: string;
     size?: string;
     article?: string;
-}
-
-// Для использования в updateFilter
-interface FilterOptions {
-    priceMin: number;
-    priceMax: number;
-    category: string[];
-    manufacturer: string[];
-    sortType: string;
 }
 
 // Список производителей для фильтра
@@ -92,7 +83,6 @@ const CabelFilter: React.FC = () => {
     const [searchValue, setSearchValue] = useState<string>('');
     const cardRefs = useRef<{[key: string]: HTMLDivElement | null}>({});
     const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-    const [animatedProduct, setAnimatedProduct] = useState<number | null>(null);
 
     // Обновляем поисковый запрос при вводе
     useEffect(() => {
@@ -119,7 +109,7 @@ const CabelFilter: React.FC = () => {
 
     // Обработчик изменения сортировки
     const handleSortChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-        sortProducts(event.target.value as any);
+        sortProducts(event.target.value as SortType);
     };
 
     const handleProductClick = (product: Product) => {
@@ -131,22 +121,6 @@ const CabelFilter: React.FC = () => {
                 price: product.cost
             }
         });
-    };
-
-    const getTargetPosition = (type: 'cart' | 'compare') => {
-        const targetElement = document.querySelector(
-            type === 'cart' 
-                ? '[data-cart-icon]' 
-                : '[data-compare-icon]'
-        );
-        if (targetElement) {
-            const rect = targetElement.getBoundingClientRect();
-            return {
-                x: rect.left + rect.width / 2,
-                y: rect.top + rect.height / 2
-            };
-        }
-        return { x: 0, y: 0 };
     };
 
     const handleAction = (e: React.MouseEvent, product: Product, type: 'cart' | 'compare') => {
@@ -236,7 +210,7 @@ const CabelFilter: React.FC = () => {
             name: product.name,
             cost: costValue,
             image: product.image || '',
-            article: product.text || '',
+            article: product.article || '',
             rating: product.rating || 4.0,
             size: product.size || ''
         };
@@ -427,7 +401,7 @@ const CabelFilter: React.FC = () => {
                                         <AddToCartAnimation
                                             startPosition={animationConfigs[product.id].startPosition}
                                             endPosition={animationConfigs[product.id].endPosition}
-                                            imageUrl={product.image}
+                                            imageUrl={product.image || ''}
                                             type={animationConfigs[product.id].type}
                                             onComplete={() => {
                                                 setAnimatingProducts(prev => ({

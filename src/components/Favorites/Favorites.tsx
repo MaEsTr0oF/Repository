@@ -4,14 +4,14 @@ import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
 
 export default function Favorites() {
-    const { favoriteItems, removeFromFavorite, addToCart } = useShop();
+    const { favorites, removeFavorite, addToCart } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
     const handleSelectAll = () => {
-        if (selectedItems.length === favoriteItems.length) {
+        if (selectedItems.length === favorites.length) {
             setSelectedItems([]);
         } else {
-            setSelectedItems(favoriteItems.map(item => item.id || ''));
+            setSelectedItems(favorites.map(item => item.id || ''));
         }
     };
 
@@ -24,11 +24,11 @@ export default function Favorites() {
     };
 
     const handleDeleteSelected = () => {
-        selectedItems.forEach(id => removeFromFavorite(id));
+        selectedItems.forEach(id => removeFavorite(id));
         setSelectedItems([]);
     };
 
-    const handleAddToCart = (item: typeof favoriteItems[0]) => {
+    const handleAddToCart = (item: typeof favorites[0]) => {
         addToCart(item);
     };
 
@@ -64,7 +64,7 @@ export default function Favorites() {
 
                 <div className={styles.favoritesContent}>
                     <div className={styles.favoriteItems}>
-                        {favoriteItems.length === 0 ? (
+                        {favorites.length === 0 ? (
                             <div className={styles.emptyFavorites}>
                                 <h2>Список отложенных товаров пуст</h2>
                                 <p>Добавьте товары, которые хотите купить позже</p>
@@ -73,7 +73,7 @@ export default function Favorites() {
                                 </Link>
                             </div>
                         ) : (
-                            favoriteItems.map(item => (
+                            favorites.map(item => (
                                 <div key={item.id} className={styles.favoriteItem}>
                                     <input 
                                         type="checkbox" 
@@ -82,14 +82,14 @@ export default function Favorites() {
                                         onChange={() => handleSelectItem(item.id || '')}
                                     />
                                     <div className={styles.itemImage}>
-                                        <img src={item.imagesrc} alt={item.label} />
+                                        <img src={item.image} alt={item.name} />
                                     </div>
                                     <div className={styles.itemInfo}>
-                                        <h3>{item.label}</h3>
-                                        <p className={styles.itemArticle}>{item.text}</p>
+                                        <h3>{item.name}</h3>
+                                        <p className={styles.itemArticle}>{item.category}</p>
                                     </div>
                                     <div className={styles.itemPrice}>
-                                        <span className={styles.price}>{item.cost} ₽</span>
+                                        <span className={styles.price}>{item.cost}</span>
                                         <div className={styles.itemActions}>
                                             <button 
                                                 className={styles.addToCart}
@@ -99,7 +99,7 @@ export default function Favorites() {
                                             </button>
                                             <button 
                                                 className={styles.itemDelete}
-                                                onClick={() => removeFromFavorite(item.id || '')}
+                                                onClick={() => removeFavorite(item.id || '')}
                                             >
                                                 <span className={styles.cross}></span>
                                             </button>
@@ -110,7 +110,7 @@ export default function Favorites() {
                         )}
                     </div>
 
-                    {favoriteItems.length > 0 && (
+                    {favorites.length > 0 && (
                         <div className={styles.favoritesInfo}>
                             <div className={styles.infoBlock}>
                                 <h2>Информация</h2>

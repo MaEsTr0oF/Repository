@@ -2,6 +2,7 @@ import styles from './ProductPage.module.css';
 import { Link, useLocation } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
 import { useState } from 'react';
+import DeliveryInfo from './DeliveryInfo';
 
 interface StarRatingProps {
     rating: number;
@@ -15,6 +16,9 @@ interface Product {
     price: number;
     image: string;
 }
+
+// Типы вкладок
+type TabType = 'description' | 'delivery';
 
 const StarRating: React.FC<StarRatingProps> = ({ rating }) => {
     const fullStars = Math.floor(rating);
@@ -72,8 +76,9 @@ const recommendedProducts: Product[] = [
 
 export default function ProductPage() {
     const location = useLocation();
-    const { productImage, title, description, price } = location.state || {};
+    const { productImage, title, description, price, deliveryInfo } = location.state || {};
     const [quantity, setQuantity] = useState(1);
+    const [activeTab, setActiveTab] = useState<TabType>('description');
     const { addToCart } = useShop();
 
     const handleQuantityChange = (delta: number) => {
@@ -85,13 +90,24 @@ export default function ProductPage() {
 
     const handleAddToCart = () => {
         addToCart({
-            imagesrc: productImage || "/img/products/product.png",
-            label: title || "Наименование товара",
-            text: description || "Описание товара",
+            id: Math.random().toString(36).substr(2, 9),
+            name: title || "Наименование товара",
             cost: (price || 2990).toString(),
-            quantity: quantity
+            image: productImage || "/img/products/product.png",
+            quantity: quantity,
+            category: "Кабельная продукция"
         });
     };
+
+    // Проверяем наличие данных для вкладок
+    const hasDescription = !!description;
+    // Всегда показываем вкладку доставки, так как у нас есть стандартная информация
+    const hasDeliveryInfo = true;
+
+    // Если нет данных для активной вкладки, но есть для другой, переключаемся
+    if (!hasDescription && activeTab === 'description') {
+        setActiveTab('delivery');
+    }
 
     return (
         <div className={styles.productPage}>
@@ -116,14 +132,45 @@ export default function ProductPage() {
                         <StarRating rating={4.5} />
                         <div className={styles.price}>{price ? `${price} ₽` : "2990 ₽"}</div>
 
-                        <div className={styles.tabs}>
-                            <button className={`${styles.tab} ${styles.active}`}>Описание</button>
-                            <button className={styles.tab}>Доставка и оплата</button>
-                        </div>
+                        {/* Отображаем вкладки только если есть данные хотя бы для одной из них */}
+                        {(hasDescription || hasDeliveryInfo) && (
+                            <div className={styles.tabs}>
+                                {hasDescription && (
+                                    <button 
+                                        className={`${styles.tab} ${activeTab === 'description' ? styles.active : ''}`}
+                                        onClick={() => setActiveTab('description')}
+                                    >
+                                        Описание
+                                    </button>
+                                )}
+                                {hasDeliveryInfo && (
+                                    <button 
+                                        className={`${styles.tab} ${activeTab === 'delivery' ? styles.active : ''}`}
+                                        onClick={() => setActiveTab('delivery')}
+                                    >
+                                        Доставка и оплата
+                                    </button>
+                                )}
+                            </div>
+                        )}
 
-                        <div className={styles.description}>
-                            <p>{description || "Описание товара отсутствует"}</p>
-                        </div>
+                        {/* Содержимое вкладок */}
+                        {activeTab === 'description' && hasDescription && (
+                            <div className={styles.description}>
+                                <p>{description}</p>
+                            </div>
+                        )}
+                        
+                        {activeTab === 'delivery' && (
+                            <DeliveryInfo customInfo={deliveryInfo} />
+                        )}
+
+                        {/* Если нет данных ни для одной вкладки, показываем сообщение */}
+                        {!hasDescription && !hasDeliveryInfo && (
+                            <div className={styles.description}>
+                                <p>Информация о товаре отсутствует</p>
+                            </div>
+                        )}
 
                         <div className={styles.actions}>
                             <div className={styles.quantity}>
@@ -170,7 +217,8 @@ export default function ProductPage() {
                                                 productImage: product.image,
                                                 title: product.title,
                                                 description: product.article,
-                                                price: product.price
+                                                price: product.price,
+                                                deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении."
                                             }}
                                             className={styles.detailsButton}
                                         >

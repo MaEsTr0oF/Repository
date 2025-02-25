@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddToCartAnimation from '../AddToCartAnimation/AddToCartAnimation';
 import styles from './ProductCard.module.css';
-import { useShop } from '../../context/ShopContext';
+import { useShop, Product, FavoriteProduct } from '../../context/ShopContext';
 import image from '/img/header/heart.png'
 import image1 from '/img/header/heart1.png'
 
@@ -24,8 +24,25 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 		type: 'cart' | 'compare';
 	} | null>(null);
 
-	const product = { imagesrc, label, text, cost };
-	const isFavorite = isInFavorites(product);
+	// Создаем объекты, соответствующие ожидаемым типам
+	const productId = `product_${Date.now()}`;
+	const productData: Product = { 
+		id: productId, 
+		name: label, 
+		cost: cost,
+		image: imagesrc,
+		category: text
+	};
+	
+	const favoriteData: FavoriteProduct = {
+		id: productId,
+		name: label,
+		cost: cost,
+		image: imagesrc,
+		category: text
+	};
+
+	const isFavorite = isInFavorites(productId);
 
 	const handleClick = () => {
 		navigate('/product/1', { state: { productImage: imagesrc, title: label, description: text, price: cost } });
@@ -33,7 +50,7 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 
 	const handleFavoriteClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		addToFavorite(product);
+		addToFavorite(favoriteData);
 	};
 
 	const getTargetPosition = (type: 'cart' | 'compare') => {
@@ -71,9 +88,9 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 		setIsAnimating(true);
 
 		if (type === 'cart') {
-			addToCart(product);
+			addToCart(productData);
 		} else {
-			addToCompare(product);
+			addToCompare(productData);
 		}
 	};
 

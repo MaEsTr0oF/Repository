@@ -1,6 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext';
+import { useShop, FavoriteProduct } from '../../context/ShopContext';
 import styles from './Favorites.module.css';
 import AppHeader from '../../components/header/AppHeader/AppHeader';
 import Footer from '../../components/Footer/Footer';
@@ -13,7 +12,7 @@ export default function Favorites() {
         removeFavorite(id);
     };
     
-    const handleAddToCart = (product: any) => {
+    const handleAddToCart = (product: FavoriteProduct) => {
         const uniqueId = `${product.id}-${Date.now()}`;
         addToCart({
             id: uniqueId,

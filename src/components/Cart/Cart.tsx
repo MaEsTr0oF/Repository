@@ -1,12 +1,12 @@
 import styles from './Cart.module.css';
 import { Link } from 'react-router-dom';
-import { useShop } from '../../context/ShopContext';
+import { useShop, FavoriteProduct } from '../../context/ShopContext';
 import { useState } from 'react';
 import image from '/img/header/heart.png'
 import image1 from '/img/header/heart1.png'
 
 export default function Cart() {
-    const { cartItems, removeFromCart, updateCartItemQuantity, addToFavorite, isInFavorites } = useShop();
+    const { cartItems, removeFromCart, updateQuantity, addToFavorite, isInFavorites } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
     const handleSelectAll = () => {
@@ -33,25 +33,42 @@ export default function Cart() {
     const handleQuantityChange = (productId: string, delta: number) => {
         const product = cartItems.find(item => item.id === productId);
         if (product) {
-            updateCartItemQuantity(productId, (product.quantity || 1) + delta);
+            const newQuantity = (product.quantity || 1) + delta;
+            if (newQuantity > 0) {
+                updateQuantity(productId, newQuantity);
+            }
         }
     };
 
     const handleFavoriteClick = (item: typeof cartItems[0]) => {
-        const productToAdd = {
-            imagesrc: item.imagesrc,
-            label: item.label,
-            text: item.text,
-            cost: item.cost
+        const productToAdd: FavoriteProduct = {
+            id: item.id,
+            name: item.name,
+            cost: item.cost,
+            image: item.image,
+            category: item.category
         };
         addToFavorite(productToAdd);
     };
 
     const calculateTotal = () => {
         return cartItems.reduce((total, item) => {
-            const cost = parseFloat(item.cost.replace(/[^\d.-]/g, ''));
+            // Удаляем все нечисловые символы, кроме точки и запятой
+            const cost = parseFloat(item.cost.replace(/[^\d.,]/g, '').replace(',', '.'));
             return total + (cost * (item.quantity || 1));
         }, 0);
+    };
+
+    // Функция для подсчета общего количества товаров
+    const getTotalItemsCount = () => {
+        return cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
+    };
+
+    // Функция для форматирования цены
+    const formatPrice = (price: string, quantity: number = 1) => {
+        // Удаляем все нечисловые символы, кроме точки и запятой
+        const numericPrice = parseFloat(price.replace(/[^\d.,]/g, '').replace(',', '.'));
+        return isNaN(numericPrice) ? price : `${(numericPrice * quantity).toFixed(2)} ₽`;
     };
 
     return (
@@ -104,28 +121,30 @@ export default function Cart() {
                                         onChange={() => handleSelectItem(item.id || '')}
                                     />
                                     <div className={styles.itemImage}>
-                                        <img src={item.imagesrc} alt={item.label} />
+                                        <img src={item.image} alt={item.name} />
                                     </div>
                                     <div className={styles.itemInfo}>
-                                        <h3>{item.label}</h3>
-                                        <p className={styles.itemArticle}>{item.text}</p>
+                                        <h3>{item.name}</h3>
+                                        <p className={styles.itemArticle}>{item.category}</p>
                                         <div className={styles.itemControls}>
                                             <div className={styles.quantityControls}>
                                                 <button 
                                                     onClick={() => handleQuantityChange(item.id!, -1)}
-                                                    disabled={item.quantity === 1}
+                                                    disabled={(item.quantity || 1) <= 1}
+                                                    className={styles.quantityButton}
                                                 >
                                                     -
                                                 </button>
                                                 <span>{item.quantity || 1}</span>
                                                 <button 
                                                     onClick={() => handleQuantityChange(item.id!, 1)}
+                                                    className={styles.quantityButton}
                                                 >
                                                     +
                                                 </button>
                                             </div>
                                             <div className={styles.itemPrice}>
-                                                {parseFloat(item.cost) * (item.quantity || 1)} ₽
+                                                {formatPrice(item.cost, item.quantity || 1)}
                                             </div>
                                             <button 
                                                 className={styles.removeButton}
@@ -136,7 +155,7 @@ export default function Cart() {
                                         </div>
                                     </div>
                                     <div className={styles.itemPrice}>
-                                        <span className={styles.price}>{item.cost} ₽</span>
+                                        <span className={styles.price}>{formatPrice(item.cost)}</span>
                                         <div className={styles.itemActions}>
                                             <img 
                                                 src={isInFavorites(item) ? image1 : image}
@@ -156,8 +175,8 @@ export default function Cart() {
                             <div className={styles.summaryBlock}>
                                 <h2>Итого</h2>
                                 <div className={styles.summaryRow}>
-                                    <span>Товары ({cartItems.length})</span>
-                                    <span>{calculateTotal()} ₽</span>
+                                    <span>Товары ({getTotalItemsCount()})</span>
+                                    <span>{calculateTotal().toFixed(2)} ₽</span>
                                 </div>
                                 <button className={styles.checkoutButton}>
                                     Оформить заказ

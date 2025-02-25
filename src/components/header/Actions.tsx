@@ -26,7 +26,7 @@ export default function Actions({ imagesrc, label }: ActionsProps) {
 	const getCount = (label: string) => {
 		switch (label) {
 			case "Корзина":
-				return cartItems.length;
+				return cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
 			case "Сравнение":
 				return compareItems.length;
 			default:

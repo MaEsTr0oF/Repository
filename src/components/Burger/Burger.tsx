@@ -37,6 +37,7 @@ export const Burger = () => {
             onClick={toggleMenu}
             aria-label="Закрыть меню"
           >
+				<span></span>
           </button>
         </div>
 
