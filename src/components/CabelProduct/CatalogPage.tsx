@@ -1,5 +1,5 @@
 import styles from './CabelProduct.module.css';
-import CabelCatalog from "./CabelCatalog/CabelCatalog";
+import CabelFilter from "./CabelFilter/CabelFilter";
 import PageTitle from "../PageTitle/PageTitle";
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import { useShop } from '../../context/ShopContext';
@@ -13,8 +13,6 @@ export default function CatalogPage() {
     
     // Используем useLayoutEffect для сброса фильтров при монтировании
     useLayoutEffect(() => {
-        console.log('CatalogPage: Компонент монтируется на маршруте', location.pathname);
-        
         // Блокируем повторный вызов сброса
         if (!isResettingRef.current) {
             isResettingRef.current = true;
@@ -32,7 +30,6 @@ export default function CatalogPage() {
         isMounted.current = true;
         
         return () => {
-            console.log('CatalogPage: Компонент размонтируется');
             isMounted.current = false;
         };
     }, [resetFilters]);
@@ -41,8 +38,6 @@ export default function CatalogPage() {
     useEffect(() => {
         // Только когда компонент уже смонтирован
         if (isMounted.current) {
-            console.log('CatalogPage: URL изменился на', location.pathname);
-            
             // Устанавливаем title страницы
             document.title = "Каталог товаров | КабельОпт";
         }
@@ -51,7 +46,7 @@ export default function CatalogPage() {
     return (
         <div className={styles.cabelProduct}>
             <PageTitle title="Каталог товаров" />
-            <CabelCatalog />
+            <CabelFilter />
         </div>
     );
 } 

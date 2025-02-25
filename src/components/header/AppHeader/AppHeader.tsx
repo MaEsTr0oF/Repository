@@ -63,9 +63,6 @@ export default function Header() {
 				product.name.toLowerCase().includes(searchValue.toLowerCase())
 			);
 			setSearchResults(results.slice(0, 5)); // Максимум 5 результатов
-			
-			// Отладочное сообщение
-			console.log('Найдено результатов:', results.length);
 		} catch (error) {
 			console.error('Ошибка при фильтрации товаров:', error);
 		}
@@ -91,6 +88,20 @@ export default function Header() {
 	const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 		setSearchValue(value);
+		
+		if (value.trim().length >= 3) {
+			// Поиск товаров по запросу
+			const results = demoProducts.filter(product => 
+				product.name.toLowerCase().includes(value.toLowerCase()) ||
+				(product.manufacturer && product.manufacturer.toLowerCase().includes(value.toLowerCase())) ||
+				(product.category && product.category.toLowerCase().includes(value.toLowerCase())) ||
+				(product.article && product.article.toLowerCase().includes(value.toLowerCase()))
+			);
+			
+			setSearchResults(results);
+		} else {
+			setSearchResults([]);
+		}
 	};
 
 	const handleProductSelect = (product: Product) => {

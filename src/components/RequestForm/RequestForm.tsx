@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import styles from './RequestForm.module.css';
 import Modal from '../Modal/Modal';
 
@@ -12,14 +12,19 @@ export default function RequestForm({ isOpen, onClose }: RequestFormProps) {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    message: ''
+    email: '',
+    comment: ''
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
-    setFormData({ name: '', phone: '', message: '' });
     setIsModalOpen(true);
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      comment: ''
+    });
   };
 
   const handleModalClose = () => {
@@ -73,9 +78,9 @@ export default function RequestForm({ isOpen, onClose }: RequestFormProps) {
             
             <div className={styles.formGroup}>
               <textarea
-                name="message"
+                name="comment"
                 placeholder="Ваше сообщение"
-                value={formData.message}
+                value={formData.comment}
                 onChange={handleChange}
                 required
                 className={styles.textarea}

@@ -32,8 +32,6 @@ function RouteChangeObserver({ children }: { children: React.ReactNode }) {
 	
 	// При изменении URL обновляем ключ, чтобы принудительно перемонтировать содержимое
 	useEffect(() => {
-		console.log('App: URL изменился на', location.pathname);
-		
 		// Используем новый pathname как ключ для обеспечения уникальности
 		setKey(location.pathname);
 		

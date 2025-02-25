@@ -13,6 +13,7 @@ export interface Product {
     article?: string;
     size?: string;
     text?: string;
+    label?: string;
 }
 
 export interface FavoriteProduct extends Product {
@@ -23,7 +24,6 @@ export interface FilterOptions {
     minPrice?: number;
     maxPrice?: number;
     category?: string;
-    manufacturer?: string;
     searchQuery?: string;
     sortType?: SortType;
 }
@@ -204,7 +204,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
         minPrice: 0,
         maxPrice: 10000,
         category: '',
-        manufacturer: '',
         searchQuery: '',
         sortType: ''
     });
@@ -225,23 +224,34 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
             });
         }
         
-        // Фильтрация по категории
+        // Фильтрация по категории - проверяем как category, так и label
         if (filterOptions.category) {
-            filtered = filtered.filter(product => product.category === filterOptions.category);
+            filtered = filtered.filter(product => {
+                // Проверяем по полю category
+                const matchesCategory = product.category === filterOptions.category;
+                
+                // Проверяем по полю label (если оно есть)
+                const matchesLabel = product.label === filterOptions.category;
+                
+                // Также проверяем, содержится ли категория в имени продукта
+                const matchesName = product.name && product.name.includes(filterOptions.category || '');
+                
+                return matchesCategory || matchesLabel || matchesName;
+            });
         }
         
-        // Фильтрация по производителю
-        if (filterOptions.manufacturer) {
-            filtered = filtered.filter(product => product.manufacturer === filterOptions.manufacturer);
-        }
-        
-        // Фильтрация по поисковому запросу
+        // Фильтрация по поисковому запросу - проверяем по всем возможным полям
         if (filterOptions.searchQuery) {
             const query = filterOptions.searchQuery.toLowerCase();
             filtered = filtered.filter(product => 
-                product.name.toLowerCase().includes(query) ||
-                (product.manufacturer && product.manufacturer.toLowerCase().includes(query)) ||
-                (product.category && product.category.toLowerCase().includes(query))
+                // Проверка имени
+                (product.name && product.name.toLowerCase().includes(query)) ||
+                // Проверка категории
+                (product.category && product.category.toLowerCase().includes(query)) ||
+                // Проверка label, если он есть
+                (product.label && product.label.toLowerCase().includes(query)) ||
+                // Проверка артикула
+                (product.article && product.article.toLowerCase().includes(query))
             );
         }
         
@@ -286,12 +296,9 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     
     // Сброс фильтров
     const resetFilters = () => {
-        console.log('ShopContext: Сброс фильтров');
-        
         // Проверяем, отличаются ли текущие значения от сбрасываемых
         const shouldReset = 
             filterOptions.category !== '' || 
-            filterOptions.manufacturer !== '' ||
             filterOptions.searchQuery !== '' ||
             filterOptions.sortType !== '' ||
             filterOptions.minPrice !== 0 ||
@@ -303,7 +310,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 minPrice: 0,
                 maxPrice: 10000,
                 category: '',
-                manufacturer: '',
                 searchQuery: '',
                 sortType: ''
             });
@@ -311,8 +317,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
             // Обновляем отфильтрованные товары напрямую, 
             // чтобы не ждать срабатывания эффекта
             setFilteredProducts(demoProducts);
-        } else {
-            console.log('ShopContext: Фильтры уже сброшены, пропускаем обновление');
         }
     };
     
@@ -364,7 +368,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 const parsedCart = JSON.parse(savedCart);
                 if (Array.isArray(parsedCart)) {
                     setCartItems(parsedCart);
-                    console.log('Корзина загружена из localStorage:', parsedCart);
                 }
             }
             
@@ -374,7 +377,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 const parsedCompare = JSON.parse(savedCompare);
                 if (Array.isArray(parsedCompare)) {
                     setCompareItems(parsedCompare);
-                    console.log('Список сравнения загружен из localStorage:', parsedCompare);
                 }
             }
             
@@ -384,7 +386,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 const parsedFavorites = JSON.parse(savedFavorites);
                 if (Array.isArray(parsedFavorites)) {
                     setFavorites(parsedFavorites);
-                    console.log('Избранное загружено из localStorage:', parsedFavorites);
                 }
             }
         } catch (error) {
@@ -396,7 +397,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     useEffect(() => {
         try {
             localStorage.setItem('cart', JSON.stringify(cartItems));
-            console.log('Корзина сохранена в localStorage:', cartItems);
         } catch (error) {
             console.error('Ошибка при сохранении корзины в localStorage:', error);
         }
@@ -406,7 +406,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     useEffect(() => {
         try {
             localStorage.setItem('compare', JSON.stringify(compareItems));
-            console.log('Список сравнения сохранен в localStorage:', compareItems);
         } catch (error) {
             console.error('Ошибка при сохранении списка сравнения в localStorage:', error);
         }
@@ -416,7 +415,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     useEffect(() => {
         try {
             localStorage.setItem('favorites', JSON.stringify(favorites));
-            console.log('Избранное сохранено в localStorage:', favorites);
         } catch (error) {
             console.error('Ошибка при сохранении избранного в localStorage:', error);
         }

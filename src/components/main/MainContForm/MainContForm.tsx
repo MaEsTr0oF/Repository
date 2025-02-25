@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import teleg from "/img/teleg.png";
 import whats from "/img/whats.png";
 import "./MainContForm.css";
@@ -9,14 +9,20 @@ export default function MainContForm() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
+    email: '',
     message: ''
   });
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Form submitted:', formData);
+    // Здесь можно добавить логику отправки данных формы
     setIsModalOpen(true);
-    setFormData({ name: '', phone: '', message: '' });
+    setFormData({
+      name: '',
+      phone: '',
+      email: '',
+      message: ''
+    });
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

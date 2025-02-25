@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation, Link, useParams } from 'react-router-dom';
 import { useShop, Product as ShopProduct, SortType } from '../../../context/ShopContext';
 import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
@@ -9,10 +9,22 @@ import image1 from '/img/header/heart1.png';
 import filterIcon from '/img/header/stats.png';
 import closeIcon from '/img/header/card.png';
 import PageTitle from '../../PageTitle/PageTitle';
+import CabelCatalog from '../CabelCatalog/CabelCatalog';
 
-interface Manufacturer {
-    id: string;
-    name: string;
+// Импортируем изображения для категорий, как в CabelCatalog
+import catImage2 from "/img/CabelCatalog/image-11.jpg"
+import catImage1 from "/img/CabelCatalog/image13.png"
+import catImage from "/img/CabelCatalog/image1.png"
+import catImage4 from "/img/CabelCatalog/image.jpg"
+import catImage5 from "/img/CabelCatalog/image2.png"
+import catImage6 from "/img/CabelCatalog/image3.png"
+
+// Интерфейс для категорий, как в CabelCatalog
+interface CategoryData {
+    image: string;
+    label: string;
+    category: string;
+    description: string;
 }
 
 // Расширим интерфейс Product, чтобы включить все необходимые поля
@@ -25,14 +37,6 @@ interface Product extends ShopProduct {
     size?: string;
     article?: string;
 }
-
-// Список производителей для фильтра
-const manufacturers: Manufacturer[] = [
-    { id: 'kamkabel', name: 'Камкабель' },
-    { id: 'uncomtech', name: 'Uncomtech' },
-    { id: 'spetskoelstroi', name: 'Спецкабельстрой' },
-    { id: 'kabelmoscow', name: 'Кабель Москва' },
-];
 
 const CabelFilter: React.FC = () => {
     const navigate = useNavigate();
@@ -54,8 +58,50 @@ const CabelFilter: React.FC = () => {
     const { category: urlCategory } = useParams<{ category?: string }>();
     const selectedCategory = urlCategory ? decodeURIComponent(urlCategory) : '';
     
+    // Состояние для отображения категорий каталога
+    const [showCategorySelector, setShowCategorySelector] = useState(!selectedCategory);
+    
+    // Определяем категории так же, как в CabelCatalog
+    const categories = useMemo<CategoryData[]>(() => [
+        {
+            image: catImage1,
+            label: "Кабель",
+            category: "Кабель",
+            description: "Широкий выбор кабельной продукции для различных нужд"
+        },
+        {
+            image: catImage2,
+            label: "Провод",
+            category: "Провод",
+            description: "Провода различного сечения и назначения"
+        },
+        {
+            image: catImage,
+            label: "Свет",
+            category: "Свет",
+            description: "Осветительные приборы и аксессуары для дома и офиса"
+        },
+        {
+            image: catImage4,
+            label: "Низковольтное оборудование",
+            category: "Низковольтное оборудование",
+            description: "Надежное низковольтное оборудование для электросетей"
+        },
+        {
+            image: catImage5,
+            label: "Системы безопасности",
+            category: "Системы безопасности",
+            description: "Современные системы безопасности и видеонаблюдения"
+        },
+        {
+            image: catImage6,
+            label: "Материалы для прокладки кабеля",
+            category: "Материалы для прокладки кабеля",
+            description: "Все необходимое для качественной прокладки кабеля"
+        }
+    ], []);
+    
     const cleanup = () => {
-        console.log('CabelFilter: Очистка состояния');
         // Не вызываем resetFilters() здесь, так как это может создать цикл
         setSearchValue('');
         setRangeValue(20);
@@ -64,17 +110,17 @@ const CabelFilter: React.FC = () => {
 
     // Инициализация при монтировании и сброс при размонтировании
     useEffect(() => {
-        console.log('CabelFilter: Компонент монтируется, selectedCategory =', selectedCategory);
-        
         // При монтировании сбрасываем локальные состояния
         setSearchValue('');
         setRangeValue(20);
         setMobileFiltersOpen(false);
         
+        // Обновляем состояние показа селектора категорий в зависимости от URL
+        setShowCategorySelector(!selectedCategory);
+        
         // Если у нас есть категория, применяем фильтр
         // Но не сбрасываем фильтры - это должно быть сделано в родительском компоненте
         if (selectedCategory && filterOptions.category !== selectedCategory) {
-            console.log('CabelFilter: Применяем фильтр категории:', selectedCategory);
             // Принудительно устанавливаем новый фильтр категории
             updateFilter('category', selectedCategory);
             // Сразу применяем фильтры
@@ -83,7 +129,6 @@ const CabelFilter: React.FC = () => {
         
         // При размонтировании очищаем только локальные состояния
         return () => {
-            console.log('CabelFilter: Компонент размонтируется, очищаем локальные состояния');
             cleanup();
         };
     }, [selectedCategory, updateFilter, applyFilters, filterOptions.category]);
@@ -92,21 +137,25 @@ const CabelFilter: React.FC = () => {
     useEffect(() => {
         // Избегаем первого вызова
         const currentPath = location.pathname;
-        console.log('CabelFilter: Изменился URL на', currentPath);
         
-        // Если мы не на странице категории, ничего не делаем
-        if (!currentPath.includes('/catalog/')) return;
+        // Если мы на странице каталога без категории, обновляем showCategorySelector
+        if (currentPath === '/catalog') {
+            setShowCategorySelector(true);
+            return;
+        }
         
-        // Если у нас есть category в URL и оно не совпадает с текущим фильтром
-        if (selectedCategory && filterOptions.category !== selectedCategory) {
-            console.log('CabelFilter: Обновляем фильтр категории при изменении URL:', selectedCategory);
-            updateFilter('category', selectedCategory);
-            applyFilters();
+        // Если мы на странице категории и у нас есть category в URL
+        if (currentPath.includes('/catalog/') && selectedCategory) {
+            setShowCategorySelector(false);
+            
+            // Если category не совпадает с текущим фильтром
+            if (filterOptions.category !== selectedCategory) {
+                updateFilter('category', selectedCategory);
+                applyFilters();
+            }
         }
     }, [location.pathname, location.key, selectedCategory, filterOptions.category, updateFilter, applyFilters]);
     
-    // Получаем уникальные категории из каталога
-    const categories = [...new Set(filteredProducts.map(product => product.category || ''))].filter(Boolean);
     
     const [animatingProducts, setAnimatingProducts] = useState<{[key: string]: boolean}>({});
     const [favoriteProducts, setFavoriteProducts] = useState<{[key: string]: boolean}>({});
@@ -122,27 +171,66 @@ const CabelFilter: React.FC = () => {
     const [selectedImage, setSelectedImage] = useState<string | null>(null);
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
+    // Добавим индикаторы активных фильтров для лучшего UX
+    const [activeFilters, setActiveFilters] = useState<{
+        price: boolean;
+        category: boolean;
+        search: boolean;
+    }>({
+        price: false,
+        category: false,
+        search: false
+    });
+
     // Обновляем поисковый запрос при вводе
     useEffect(() => {
         const debounceTimer = setTimeout(() => {
             searchProducts(searchValue);
+            // Обновляем индикатор активного поиска, если есть текст
+            setActiveFilters(prev => ({ ...prev, search: !!searchValue.trim() }));
         }, 500);
         
         return () => clearTimeout(debounceTimer);
     }, [searchValue, searchProducts]);
 
-    // Обработчик изменения диапазона цены
+    // Модифицируем обработчик изменения диапазона цены
     const handlePriceRangeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = parseInt(event.target.value);
         setRangeValue(value);
         // Используем maxPrice как название поля фильтра и значение без умножения
         updateFilter('maxPrice', value);
+        // Обновляем состояние активных фильтров
+        setActiveFilters(prev => ({ ...prev, price: value > 0 }));
+        // Применяем фильтры сразу после изменения
+        applyFilters();
     };
 
     // Обработчик изменения категории
     const handleCategoryChange = (category: string) => {
+        // Если категория уже выбрана, то снимаем выбор и возвращаемся в общий каталог
+        if (filterOptions.category === category) {
+            // Очищаем состояние перед сбросом категории
+            cleanup();
+            
+            // Сбрасываем все фильтры
+            resetFilters();
+            
+            // Показываем селектор категорий при сбросе выбора
+            setShowCategorySelector(true);
+            
+            // Возвращаемся на страницу каталога
+            navigate('/catalog', { replace: true });
+            return;
+        }
+        
         // Очищаем состояние перед сменой категории
         cleanup();
+        
+        // Устанавливаем флаг, что больше не нужно показывать селектор категорий
+        setShowCategorySelector(false);
+        
+        // Сначала сбрасываем все фильтры
+        resetFilters();
         
         // Последовательно применяем новый фильтр категории
         updateFilter('category', category);
@@ -168,7 +256,7 @@ const CabelFilter: React.FC = () => {
                 description: product.text || `Подробное описание товара ${product.name}. Характеристики и технические данные будут доступны в ближайшее время.`,
                 price: product.cost,
                 article: product.article || 'Н/Д',
-                brand: product.manufacturer || 'КабельОпт',
+                brand: 'КабельОпт',
                 deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте."
             }
         });
@@ -278,14 +366,40 @@ const CabelFilter: React.FC = () => {
 
     // Обработчик возврата к категориям
     const handleBackToCategories = () => {
-        console.log('CabelFilter: Возврат к списку категорий');
+        // Сбрасываем состояния
+        cleanup();
         
-        // Сбрасываем только локальные состояния перед возвратом
-        // resetFilters будет вызван при монтировании CatalogPage
-        cleanup(); 
+        // Сбрасываем все фильтры
+        resetFilters();
         
-        // Используем replace: true, так как это действие "назад"
+        // Показываем селектор категорий при возврате
+        setShowCategorySelector(true);
+        
+        // Используем replace: true для "назад" к каталогу
         navigate('/catalog', { replace: true });
+    };
+
+    // Функция для сброса всех фильтров
+    const handleResetFilters = () => {
+        // Сначала обновляем локальные состояния
+        setRangeValue(20);
+        setSearchValue('');
+        
+        // Сбрасываем все фильтры в контексте
+        resetFilters();
+        
+        // Сбрасываем активные индикаторы фильтров
+        setActiveFilters({
+            price: false,
+            category: false,
+            search: false
+        });
+        
+        // Если мы сбрасываем фильтры и находимся на странице категории,
+        // возвращаемся на общую страницу каталога
+        if (selectedCategory) {
+            navigate('/catalog', { replace: true });
+        }
     };
 
     return (
@@ -307,8 +421,15 @@ const CabelFilter: React.FC = () => {
                 )}
             </div>
             
+            {/* Если нет выбранной категории или явно указано показать селектор, отображаем категории */}
+            {showCategorySelector && (
+                <div className={styles.categorySelector}>
+                    <CabelCatalog />
+                </div>
+            )}
+            
             <div className={styles.filter_title}>
-                <h2>{selectedCategory ? `Товары категории "${selectedCategory}"` : 'Фильтр продуктов'}</h2>
+                <h2>{selectedCategory ? `Товары категории "${selectedCategory}"` : 'Все товары'}</h2>
                 <div className={styles.sortAndSearch}>
                     <form className={styles.searchBox} onSubmit={(e) => { e.preventDefault(); searchProducts(searchValue); }}>
                         <input 
@@ -371,40 +492,65 @@ const CabelFilter: React.FC = () => {
                     <div className={styles.filter_section}>
                         <h3>Категории</h3>
                         <div className={styles.checkboxGroup}>
-                            {categories.map((category) => (
-                                <label key={category} className={styles.checkboxLabel}>
+                            {categories.map((categoryItem) => (
+                                <label key={categoryItem.category} className={styles.checkboxLabel}>
                                     <input 
                                         type="checkbox" 
                                         className={styles.checkbox}
-                                        checked={filterOptions.category === category}
-                                        onChange={() => handleCategoryChange(category)}
+                                        checked={filterOptions.category === categoryItem.category}
+                                        onChange={() => handleCategoryChange(categoryItem.category)}
                                     />
                                     <span className={styles.checkmark}></span>
-                                    {category}
+                                    {categoryItem.label}
                                 </label>
                             ))}
                         </div>
                     </div>
-                    <div className={styles.filter_section}>
-                        <h3>Производители</h3>
-                        <div className={styles.checkboxGroup}>
-                            {manufacturers.map(manufacturer => (
-                                <label key={manufacturer.id} className={styles.checkboxLabel}>
-                                    <input 
-                                        type="checkbox" 
-                                        className={styles.checkbox}
-                                        onChange={() => updateFilter('manufacturer', manufacturer.id)}
-                                        checked={filterOptions.manufacturer === manufacturer.id}
-                                    />
-                                    <span className={styles.checkmark}></span>
-                                    {manufacturer.name}
-                                </label>
-                            ))}
+                    
+                    {/* Индикаторы активных фильтров */}
+                    {(activeFilters.price || activeFilters.search) && (
+                        <div className={styles.activeFiltersIndicator}>
+                            <h3>Активные фильтры:</h3>
+                            <div className={styles.filterTags}>
+                                {activeFilters.price && (
+                                    <div className={styles.filterTag}>
+                                        Цена до {rangeValue} ₽
+                                        <button 
+                                            onClick={() => {
+                                                setRangeValue(20);
+                                                updateFilter('maxPrice', 20);
+                                                setActiveFilters(prev => ({ ...prev, price: false }));
+                                                applyFilters();
+                                            }}
+                                            className={styles.removeFilterTag}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                )}
+                                
+                                {activeFilters.search && searchValue && (
+                                    <div className={styles.filterTag}>
+                                        Поиск: {searchValue}
+                                        <button 
+                                            onClick={() => {
+                                                setSearchValue('');
+                                                setActiveFilters(prev => ({ ...prev, search: false }));
+                                                searchProducts('');
+                                            }}
+                                            className={styles.removeFilterTag}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
+                    
                     <button 
                         className={styles.resetButton}
-                        onClick={resetFilters}
+                        onClick={handleResetFilters}
                     >
                         Сбросить все фильтры
                     </button>
@@ -433,6 +579,13 @@ const CabelFilter: React.FC = () => {
                                 >
                                     ← Вернуться к категориям
                                 </button>
+                            )}
+                            
+                            {/* Если мы на странице без категории и нет товаров, показываем категории */}
+                            {!selectedCategory && !showCategorySelector && (
+                                <div className={styles.categorySelector} style={{ marginTop: '30px' }}>
+                                    <CabelCatalog />
+                                </div>
                             )}
                         </div>
                     ) : (

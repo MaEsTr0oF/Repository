@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import styles from './mainFind.module.css';
 import Modal from '../../Modal/Modal';
+import { useNavigate } from 'react-router-dom';
 
 export default function MainFind() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [formData, setFormData] = useState({
 		query: ''
 	});
+	const navigate = useNavigate();
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		console.log('Search query:', formData.query);
-		setIsModalOpen(true);
-		setFormData({ query: '' });
+		// Здесь можно добавить логику отправки запроса
+		// или перенаправления на страницу поиска
+		
+		navigate(`/catalog?search=${encodeURIComponent(formData.query)}`);
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -104,12 +104,9 @@ export default function CabelCatalog(){
 	], []);
 	
 	const handleCategoryClick = useCallback((category: string) => {
-		console.log('CabelCatalog: Клик по категории:', category);
-		
 		// Переходим на страницу категории
 		// Фильтры будут сброшены и применены компонентом CategoryPage
 		const encodedCategory = encodeURIComponent(category);
-		console.log('CabelCatalog: Переходим на URL:', `/catalog/${encodedCategory}`);
 		
 		// Используем navigate без replace для правильной работы истории браузера
 		navigate(`/catalog/${encodedCategory}`);

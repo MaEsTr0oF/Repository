@@ -15,14 +15,11 @@ export default function CategoryPage() {
     
     // Используем useLayoutEffect для начальной настройки
     useLayoutEffect(() => {
-        console.log('CategoryPage: Компонент монтируется для категории:', category);
-        
         // Устанавливаем флаг монтирования
         isMounted.current = true;
         previousCategory.current = category;
         
         return () => {
-            console.log('CategoryPage: Компонент размонтируется');
             isMounted.current = false;
         };
     }, [category]);
@@ -32,7 +29,6 @@ export default function CategoryPage() {
         // Если нет категории или компонент не смонтирован, выходим
         if (!category || !isMounted.current) {
             if (!category) {
-                console.log('CategoryPage: Нет категории, перенаправляем на /catalog');
                 navigate('/catalog', { replace: true });
             }
             return;
@@ -40,7 +36,6 @@ export default function CategoryPage() {
         
         // Проверяем, изменилась ли категория
         if (previousCategory.current !== category) {
-            console.log('CategoryPage: Категория изменилась с', previousCategory.current, 'на', category);
             previousCategory.current = category;
         }
         
@@ -55,7 +50,6 @@ export default function CategoryPage() {
                 resetFilters();
                 
                 // Устанавливаем фильтр категории
-                console.log('CategoryPage: Применяем фильтр для категории:', decodedCategory);
                 updateFilter('category', decodedCategory);
                 
                 // Применяем фильтры

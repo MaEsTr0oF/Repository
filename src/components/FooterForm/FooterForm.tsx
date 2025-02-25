@@ -10,12 +10,15 @@ export default function FooterForm() {
 		message: ''
 	});
 
-	const handleSubmit = (e: FormEvent) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		// Здесь можно добавить логику отправки данных на сервер
-		console.log('Form submitted:', formData);
+		// Здесь можно добавить логику отправки данных формы
 		setIsModalOpen(true);
-		setFormData({ name: '', phone: '', message: '' }); // Очищаем форму
+		setFormData({
+			name: '',
+			phone: '',
+			email: ''
+		});
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
