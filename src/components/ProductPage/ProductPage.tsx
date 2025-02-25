@@ -12,6 +12,8 @@ interface Product {
     article: string;
     price: number;
     image: string;
+    manufacturer?: string;
+    text?: string;
 }
 
 // Типы вкладок
@@ -21,30 +23,38 @@ const recommendedProducts: Product[] = [
     {
         id: 1,
         title: 'Силовой кабель',
-        article: '1234567890',
+        article: 'СК-1234567890',
         price: 10.26,
-        image: '/img/products/image1.png'
+        image: '/img/products/image1.png',
+        manufacturer: 'Камкабель',
+        text: 'Силовой кабель для промышленного использования. Высокая надежность и долговечность.'
     },
     {
         id: 2,
         title: 'Кабель управления',
-        article: '1234567890',
+        article: 'КУ-1234567890',
         price: 10.61,
-        image: '/img/products/image2.png'
+        image: '/img/products/image2.png',
+        manufacturer: 'Uncomtech',
+        text: 'Кабель управления для систем автоматизации. Устойчив к помехам и электромагнитным воздействиям.'
     },
     {
         id: 3,
         title: 'Монтажный универсальный кабель',
-        article: '1234567890',
+        article: 'МУК-1234567890',
         price: 10.03,
-        image: '/img/products/image3.png'
+        image: '/img/products/image3.png',
+        manufacturer: 'Спецкабельстрой',
+        text: 'Универсальный монтажный кабель для различных типов соединений. Простота монтажа и надежность.'
     },
     {
         id: 4,
         title: 'Контрольный кабель',
-        article: '1234567890',
+        article: 'КК-1234567890',
         price: 10.17,
-        image: '/img/products/image4.png'
+        image: '/img/products/image4.png',
+        manufacturer: 'Кабель Москва',
+        text: 'Контрольный кабель для систем мониторинга и управления. Высокая точность передачи сигнала.'
     }
 ];
 
@@ -56,7 +66,7 @@ export default function ProductPage() {
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     
     // Получаем данные о товаре из state навигации или используем заглушку
-    const { title, price, productImage, description, deliveryInfo } = location.state || {};
+    const { title, price, productImage, description, deliveryInfo, article, brand } = location.state || {};
     
     // Добавляем PageTitle с динамическим заголовком товара
     const pageTitle = title ? `${title} - КабельОпт` : 'Товар - КабельОпт';
@@ -69,13 +79,20 @@ export default function ProductPage() {
     };
 
     const handleAddToCart = () => {
+        // Используем данные из location.state или заглушки
+        const productId = location.state?.id || Math.random().toString(36).substr(2, 9);
+        const productTitle = title || "Наименование товара";
+        const productPrice = (price || 2990).toString();
+        const productImg = productImage || "/img/products/product.png";
+        const productCategory = location.state?.category || "Кабельная продукция";
+        
         addToCart({
-            id: Math.random().toString(36).substr(2, 9),
-            name: title || "Наименование товара",
-            cost: (price || 2990).toString(),
-            image: productImage || "/img/products/product.png",
+            id: productId,
+            name: productTitle,
+            cost: productPrice,
+            image: productImg,
             quantity: quantity,
-            category: "Кабельная продукция"
+            category: productCategory
         });
     };
 
@@ -116,9 +133,9 @@ export default function ProductPage() {
                     </div>
 
                     <div className={styles.productInfo}>
-                        <div className={styles.brand}>Бренд</div>
+                        <div className={styles.brand}>{brand || 'Бренд'}</div>
                         <h1>{title || "Наименование товара"}</h1>
-                        <div className={styles.article}>Артикул</div>
+                        <div className={styles.article}>Артикул: {article || 'Н/Д'}</div>
                         <div className={styles.price}>{price ? `${price} ₽` : "2990 ₽"}</div>
 
                         {/* Отображаем вкладки только если есть данные хотя бы для одной из них */}
@@ -205,9 +222,11 @@ export default function ProductPage() {
                                             state={{
                                                 productImage: product.image,
                                                 title: product.title,
-                                                description: product.article,
+                                                description: product.text || `Подробное описание товара ${product.title}. Характеристики и технические данные будут доступны в ближайшее время.`,
                                                 price: product.price,
-                                                deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении."
+                                                article: product.article || 'Н/Д',
+                                                brand: product.manufacturer || 'КабельОпт',
+                                                deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте."
                                             }}
                                             className={styles.detailsButton}
                                         >

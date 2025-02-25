@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useShop, Product as ShopProduct, SortType } from '../../../context/ShopContext';
 import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
 import ImageModal from '../../ImageModal/ImageModal';
@@ -8,6 +8,7 @@ import image from '/img/header/heart.png';
 import image1 from '/img/header/heart1.png';
 import filterIcon from '/img/header/stats.png';
 import closeIcon from '/img/header/card.png';
+import PageTitle from '../../PageTitle/PageTitle';
 
 interface Manufacturer {
     id: string;
@@ -35,6 +36,7 @@ const manufacturers: Manufacturer[] = [
 
 const CabelFilter: React.FC = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const { 
         addToCart, 
         addToCompare, 
@@ -45,7 +47,19 @@ const CabelFilter: React.FC = () => {
         resetFilters, 
         searchProducts,
         sortProducts,
+        applyFilters
     } = useShop();
+    
+    // Получаем выбранную категорию из состояния навигации
+    const selectedCategory = location.state?.selectedCategory || '';
+    
+    // Применяем фильтр по категории при монтировании компонента
+    useEffect(() => {
+        if (selectedCategory) {
+            updateFilter('category', selectedCategory);
+            applyFilters();
+        }
+    }, [selectedCategory, updateFilter, applyFilters]);
     
     // Получаем уникальные категории из каталога
     const categories = [...new Set(filteredProducts.map(product => product.category || ''))].filter(Boolean);
@@ -97,8 +111,11 @@ const CabelFilter: React.FC = () => {
             state: {
                 productImage: product.image,
                 title: product.name,
-                description: product.text || '',
-                price: product.cost
+                description: product.text || `Подробное описание товара ${product.name}. Характеристики и технические данные будут доступны в ближайшее время.`,
+                price: product.cost,
+                article: product.article || 'Н/Д',
+                brand: product.manufacturer || 'КабельОпт',
+                deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте."
             }
         });
     };
@@ -207,8 +224,25 @@ const CabelFilter: React.FC = () => {
 
     return (
         <div className={styles.filter}>
+            {selectedCategory && (
+                <PageTitle title={`Категория: ${selectedCategory}`} />
+            )}
+            
+            {/* Хлебные крошки */}
+            <div className={styles.breadcrumbs}>
+                <Link to="/">Главная</Link>
+                <span className={styles.breadcrumbSeparator}>/</span>
+                <Link to="/catalog">Каталог</Link>
+                {selectedCategory && (
+                    <>
+                        <span className={styles.breadcrumbSeparator}>/</span>
+                        <span className={styles.breadcrumbCurrent}>{selectedCategory}</span>
+                    </>
+                )}
+            </div>
+            
             <div className={styles.filter_title}>
-                <h2>Фильтр продуктов</h2>
+                <h2>{selectedCategory ? `Товары категории "${selectedCategory}"` : 'Фильтр продуктов'}</h2>
                 <div className={styles.sortAndSearch}>
                     <form className={styles.searchBox} onSubmit={(e) => { e.preventDefault(); searchProducts(searchValue); }}>
                         <input 
@@ -242,6 +276,17 @@ const CabelFilter: React.FC = () => {
             </div>
             <div className={styles.filter_body}>
                 <div className={`${styles.filter_sidebar} ${mobileFiltersOpen ? styles.mobileSidebarOpen : ''}`}>
+                    {selectedCategory && (
+                        <button 
+                            className={styles.backToCategoriesButton}
+                            onClick={() => {
+                                resetFilters();
+                                navigate('/catalog');
+                            }}
+                        >
+                            ← Вернуться к категориям
+                        </button>
+                    )}
                     <div className={styles.filter_section}>
                         <h3>Цена</h3>
                         <div className={styles.priceRange}>
@@ -313,8 +358,22 @@ const CabelFilter: React.FC = () => {
                 <div className={styles.filter_cards}>
                     {products.length === 0 ? (
                         <div className={styles.noResults}>
-                            <h3>Товары не найдены</h3>
-                            <p>Попробуйте изменить параметры фильтрации</p>
+                            <h3>{selectedCategory 
+                                ? `Товары в категории "${selectedCategory}" не найдены` 
+                                : 'Товары не найдены'}</h3>
+                            <p>Попробуйте изменить параметры фильтрации или выбрать другую категорию</p>
+                            {selectedCategory && (
+                                <button 
+                                    className={styles.backToCategoriesButton}
+                                    onClick={() => {
+                                        resetFilters();
+                                        navigate('/catalog');
+                                    }}
+                                    style={{ marginTop: '20px', width: 'auto', display: 'inline-block' }}
+                                >
+                                    ← Вернуться к категориям
+                                </button>
+                            )}
                         </div>
                     ) : (
                         products.map((product) => {
@@ -328,6 +387,8 @@ const CabelFilter: React.FC = () => {
                                             cardRefs.current[product.id] = el;
                                         }
                                     }}
+                                    onClick={() => handleProductClick(product)}
+                                    style={{ cursor: 'pointer' }}
                                 >
                                     {product.size && (
                                         <div className={styles.size_badge}>{product.size}</div>
@@ -336,17 +397,26 @@ const CabelFilter: React.FC = () => {
                                         <img 
                                             src={product.image} 
                                             alt={product.name || product.title} 
-                                            onClick={(e) => handleImageClick(e, product.image || '')}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Предотвращаем всплытие события
+                                                handleImageClick(e, product.image || '');
+                                            }}
                                             style={{ cursor: 'zoom-in' }}
                                         />
                                         <div 
                                             className={styles.productOverlay}
-                                            onClick={() => handleProductClick(product)}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                                handleProductClick(product);
+                                            }}
                                         ></div>
                                     </div>
                                     <div 
                                         className={styles.card_title} 
-                                        onClick={() => handleProductClick(product)}
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                            handleProductClick(product);
+                                        }}
                                         style={{ cursor: 'pointer' }}
                                     >
                                         <h2>{product.name || product.title}</h2>
@@ -356,14 +426,20 @@ const CabelFilter: React.FC = () => {
                                         <h2>{product.cost} ₽</h2>
                                         <button 
                                             className={styles.card_more_button}
-                                            onClick={() => handleProductClick(product)}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                                handleProductClick(product);
+                                            }}
                                             title="Посмотреть детали товара"
                                         >
                                             Подробнее
                                         </button>
                                         <button 
                                             className={styles.card_more_button}
-                                            onClick={(e) => handleAction(e, product, 'cart')}
+                                            onClick={(e) => {
+                                                e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                                handleAction(e, product, 'cart');
+                                            }}
                                             title="Добавить в корзину"
                                         >
                                             В корзину
@@ -372,14 +448,20 @@ const CabelFilter: React.FC = () => {
                                             <img 
                                                 src={isFavorite ? image1 : image} 
                                                 alt="В избранное"
-                                                onClick={(e) => handleFavoriteClick(e, product)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                                    handleFavoriteClick(e, product);
+                                                }}
                                                 title="Добавить в избранное"
                                                 style={{ marginRight: '12px' }}
                                             />
                                             <img 
                                                 src={filterIcon} 
                                                 alt="Сравнить"
-                                                onClick={(e) => handleAction(e, product, 'compare')}
+                                                onClick={(e) => {
+                                                    e.stopPropagation(); // Предотвращаем двойное срабатывание
+                                                    handleAction(e, product, 'compare');
+                                                }}
                                                 title="Добавить к сравнению"
                                             />
                                         </div>
