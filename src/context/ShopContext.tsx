@@ -286,14 +286,34 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     
     // Сброс фильтров
     const resetFilters = () => {
-        setFilterOptions({
-            minPrice: 0,
-            maxPrice: 10000,
-            category: '',
-            manufacturer: '',
-            searchQuery: '',
-            sortType: ''
-        });
+        console.log('ShopContext: Сброс фильтров');
+        
+        // Проверяем, отличаются ли текущие значения от сбрасываемых
+        const shouldReset = 
+            filterOptions.category !== '' || 
+            filterOptions.manufacturer !== '' ||
+            filterOptions.searchQuery !== '' ||
+            filterOptions.sortType !== '' ||
+            filterOptions.minPrice !== 0 ||
+            filterOptions.maxPrice !== 10000;
+        
+        if (shouldReset) {
+            // Обновляем только если есть реальное изменение
+            setFilterOptions({
+                minPrice: 0,
+                maxPrice: 10000,
+                category: '',
+                manufacturer: '',
+                searchQuery: '',
+                sortType: ''
+            });
+            
+            // Обновляем отфильтрованные товары напрямую, 
+            // чтобы не ждать срабатывания эффекта
+            setFilteredProducts(demoProducts);
+        } else {
+            console.log('ShopContext: Фильтры уже сброшены, пропускаем обновление');
+        }
     };
     
     // Сортировка товаров
@@ -327,7 +347,12 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     
     // Применяем фильтры при изменении опций фильтрации
     useEffect(() => {
-        applyFilters();
+        // Предотвращаем бесконечные циклы вызовов
+        const timer = setTimeout(() => {
+            applyFilters();
+        }, 0);
+        
+        return () => clearTimeout(timer);
     }, [filterOptions]);
     
     // Загрузка данных из localStorage при инициализации

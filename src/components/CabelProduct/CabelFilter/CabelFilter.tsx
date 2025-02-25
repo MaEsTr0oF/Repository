@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, useParams } from 'react-router-dom';
 import { useShop, Product as ShopProduct, SortType } from '../../../context/ShopContext';
 import AddToCartAnimation from '../../AddToCartAnimation/AddToCartAnimation';
 import ImageModal from '../../ImageModal/ImageModal';
@@ -50,16 +50,60 @@ const CabelFilter: React.FC = () => {
         applyFilters
     } = useShop();
     
-    // Получаем выбранную категорию из состояния навигации
-    const selectedCategory = location.state?.selectedCategory || '';
+    // Получаем выбранную категорию из URL параметров - используем useParams
+    const { category: urlCategory } = useParams<{ category?: string }>();
+    const selectedCategory = urlCategory ? decodeURIComponent(urlCategory) : '';
     
-    // Применяем фильтр по категории при монтировании компонента
+    const cleanup = () => {
+        console.log('CabelFilter: Очистка состояния');
+        // Не вызываем resetFilters() здесь, так как это может создать цикл
+        setSearchValue('');
+        setRangeValue(20);
+        setMobileFiltersOpen(false);
+    };
+
+    // Инициализация при монтировании и сброс при размонтировании
     useEffect(() => {
-        if (selectedCategory) {
+        console.log('CabelFilter: Компонент монтируется, selectedCategory =', selectedCategory);
+        
+        // При монтировании сбрасываем локальные состояния
+        setSearchValue('');
+        setRangeValue(20);
+        setMobileFiltersOpen(false);
+        
+        // Если у нас есть категория, применяем фильтр
+        // Но не сбрасываем фильтры - это должно быть сделано в родительском компоненте
+        if (selectedCategory && filterOptions.category !== selectedCategory) {
+            console.log('CabelFilter: Применяем фильтр категории:', selectedCategory);
+            // Принудительно устанавливаем новый фильтр категории
+            updateFilter('category', selectedCategory);
+            // Сразу применяем фильтры
+            applyFilters();
+        }
+        
+        // При размонтировании очищаем только локальные состояния
+        return () => {
+            console.log('CabelFilter: Компонент размонтируется, очищаем локальные состояния');
+            cleanup();
+        };
+    }, [selectedCategory, updateFilter, applyFilters, filterOptions.category]);
+
+    // Дополнительный эффект для обработки изменений URL без перемонтирования
+    useEffect(() => {
+        // Избегаем первого вызова
+        const currentPath = location.pathname;
+        console.log('CabelFilter: Изменился URL на', currentPath);
+        
+        // Если мы не на странице категории, ничего не делаем
+        if (!currentPath.includes('/catalog/')) return;
+        
+        // Если у нас есть category в URL и оно не совпадает с текущим фильтром
+        if (selectedCategory && filterOptions.category !== selectedCategory) {
+            console.log('CabelFilter: Обновляем фильтр категории при изменении URL:', selectedCategory);
             updateFilter('category', selectedCategory);
             applyFilters();
         }
-    }, [selectedCategory, updateFilter, applyFilters]);
+    }, [location.pathname, location.key, selectedCategory, filterOptions.category, updateFilter, applyFilters]);
     
     // Получаем уникальные категории из каталога
     const categories = [...new Set(filteredProducts.map(product => product.category || ''))].filter(Boolean);
@@ -97,8 +141,18 @@ const CabelFilter: React.FC = () => {
 
     // Обработчик изменения категории
     const handleCategoryChange = (category: string) => {
-        // Используем правильное поле из filterOptions
+        // Очищаем состояние перед сменой категории
+        cleanup();
+        
+        // Последовательно применяем новый фильтр категории
         updateFilter('category', category);
+        applyFilters();
+        
+        // Переходим на страницу категории
+        const encodedCategory = encodeURIComponent(category);
+        navigate(`/catalog/${encodedCategory}`, { 
+            replace: false // Не заменяем запись в истории, чтобы работала кнопка "Назад"
+        });
     };
 
     // Обработчик изменения сортировки
@@ -222,6 +276,18 @@ const CabelFilter: React.FC = () => {
         setMobileFiltersOpen(!mobileFiltersOpen);
     };
 
+    // Обработчик возврата к категориям
+    const handleBackToCategories = () => {
+        console.log('CabelFilter: Возврат к списку категорий');
+        
+        // Сбрасываем только локальные состояния перед возвратом
+        // resetFilters будет вызван при монтировании CatalogPage
+        cleanup(); 
+        
+        // Используем replace: true, так как это действие "назад"
+        navigate('/catalog', { replace: true });
+    };
+
     return (
         <div className={styles.filter}>
             {selectedCategory && (
@@ -230,9 +296,9 @@ const CabelFilter: React.FC = () => {
             
             {/* Хлебные крошки */}
             <div className={styles.breadcrumbs}>
-                <Link to="/">Главная</Link>
+                <Link to="/" replace>Главная</Link>
                 <span className={styles.breadcrumbSeparator}>/</span>
-                <Link to="/catalog">Каталог</Link>
+                <Link to="/catalog" replace>Каталог</Link>
                 {selectedCategory && (
                     <>
                         <span className={styles.breadcrumbSeparator}>/</span>
@@ -279,10 +345,7 @@ const CabelFilter: React.FC = () => {
                     {selectedCategory && (
                         <button 
                             className={styles.backToCategoriesButton}
-                            onClick={() => {
-                                resetFilters();
-                                navigate('/catalog');
-                            }}
+                            onClick={handleBackToCategories}
                         >
                             ← Вернуться к категориям
                         </button>
@@ -365,10 +428,7 @@ const CabelFilter: React.FC = () => {
                             {selectedCategory && (
                                 <button 
                                     className={styles.backToCategoriesButton}
-                                    onClick={() => {
-                                        resetFilters();
-                                        navigate('/catalog');
-                                    }}
+                                    onClick={handleBackToCategories}
                                     style={{ marginTop: '20px', width: 'auto', display: 'inline-block' }}
                                 >
                                     ← Вернуться к категориям

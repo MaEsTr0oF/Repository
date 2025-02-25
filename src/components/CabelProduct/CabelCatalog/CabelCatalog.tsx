@@ -7,8 +7,7 @@ import image5 from "/img/CabelCatalog/image2.png"
 import image6 from "/img/CabelCatalog/image3.png"
 import PageTitle from "../../PageTitle/PageTitle"
 import { useNavigate } from "react-router-dom"
-import { useShop } from "../../../context/ShopContext"
-import React, { useMemo, useCallback, useState } from "react"
+import React, { useMemo, useCallback } from "react"
 
 interface CategoryData {
 	image: string;
@@ -63,10 +62,6 @@ const Card = React.memo(function Card({
 
 export default function CabelCatalog(){
 	const navigate = useNavigate();
-	const { updateFilter, resetFilters } = useShop();
-	
-	// Предотвращаем повторные рендеры при навигации
-	const [isNavigating, setIsNavigating] = useState(false);
 	
 	// Данные о категориях - используем useMemo для предотвращения ненужных перерендеров
 	const categories = useMemo<CategoryData[]>(() => [
@@ -109,27 +104,16 @@ export default function CabelCatalog(){
 	], []);
 	
 	const handleCategoryClick = useCallback((category: string) => {
-		if (isNavigating) return;
-		setIsNavigating(true);
-
-		if (document.activeElement instanceof HTMLElement) {
-			document.activeElement.blur();
-		}
-
-		resetFilters();
-		updateFilter('category', category);
-		navigate(`/catalog/${encodeURIComponent(category)}`);
+		console.log('CabelCatalog: Клик по категории:', category);
 		
-		// Прокручиваем страницу к фильтрам с задержкой
-		setTimeout(() => {
-			const filterElement = document.querySelector(`.${styles.cabel}`);
-			if (filterElement) {
-				filterElement.scrollIntoView({ behavior: 'smooth' });
-			}
-			// Сбрасываем флаг навигации
-			setIsNavigating(false);
-		}, 300);
-	}, [navigate, resetFilters, updateFilter, isNavigating]);
+		// Переходим на страницу категории
+		// Фильтры будут сброшены и применены компонентом CategoryPage
+		const encodedCategory = encodeURIComponent(category);
+		console.log('CabelCatalog: Переходим на URL:', `/catalog/${encodedCategory}`);
+		
+		// Используем navigate без replace для правильной работы истории браузера
+		navigate(`/catalog/${encodedCategory}`);
+	}, [navigate]);
 	
 	// Мемоизируем рендеринг карточек
 	const categoryCards = useMemo(() => {

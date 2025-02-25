@@ -1,48 +1,59 @@
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams, Navigate } from 'react-router-dom';
 import styles from './CabelProduct.module.css'
 import CabelCatalog from "./CabelCatalog/CabelCatalog";
 import CabelFilter from "./CabelFilter/CabelFilter";
 import PageTitle from "../PageTitle/PageTitle";
-import { useEffect, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useShop } from '../../context/ShopContext';
 
 export default function CabelProduct() {
 	const location = useLocation();
 	const { category } = useParams<{ category?: string }>();
 	const { updateFilter, resetFilters, applyFilters } = useShop();
-	
-	// Получаем категорию либо из параметров URL, либо из состояния навигации
-	const selectedCategory = useMemo(() => {
-		return category || location.state?.selectedCategory || '';
-	}, [category, location.state?.selectedCategory]);
-	
-	// Применяем фильтр по категории при монтировании компонента
+	const [key, setKey] = useState(0);
+
+	// Эффект для обработки изменений маршрута
 	useEffect(() => {
-		resetFilters();
-		if (selectedCategory) {
-			updateFilter('category', selectedCategory);
+		// Принудительно обновляем компонент при изменении маршрута
+		setKey(prev => prev + 1);
+
+		// Если мы находимся на странице каталога без категории
+		if (location.pathname === '/catalog') {
+			resetFilters();
+			return;
 		}
-		applyFilters();
-	}, [selectedCategory, updateFilter, resetFilters, applyFilters]);
-	
-	// Мемоизируем компоненты для предотвращения лишних обновлений
-	const pageTitleComponent = useMemo(() => {
-		return !selectedCategory && <PageTitle title="Каталог товаров" />;
-	}, [selectedCategory]);
-	
-	const cabelCatalogComponent = useMemo(() => {
-		return !selectedCategory && <CabelCatalog />;
-	}, [selectedCategory]);
-	
-	return(
-		<div className={styles.cabelProduct}>
-			{pageTitleComponent}
-			
-			{/* Показываем каталог категорий только если не выбрана конкретная категория */}
-			{cabelCatalogComponent}
-			
-			{/* Фильтр товаров показываем всегда */}
-			<CabelFilter />
+
+		// Если у нас есть категория в URL
+		if (category) {
+			resetFilters();
+			updateFilter('category', decodeURIComponent(category));
+			applyFilters();
+		}
+
+		// Очистка при размонтировании
+		return () => {
+			resetFilters();
+		};
+	}, [location.pathname, category, resetFilters, updateFilter, applyFilters]);
+
+	// Проверяем, что мы находимся на правильном маршруте
+	if (!location.pathname.startsWith('/catalog')) {
+		return <Navigate to="/catalog" replace />;
+	}
+
+	// Определяем, что показывать на основе текущего URL
+	const showCatalog = location.pathname === '/catalog';
+
+	return (
+		<div className={styles.cabelProduct} key={`${key}-${location.pathname}`}>
+			{showCatalog ? (
+				<>
+					<PageTitle title="Каталог товаров" />
+					<CabelCatalog key={`catalog-${key}`} />
+				</>
+			) : (
+				<CabelFilter key={`filter-${key}-${category}`} />
+			)}
 		</div>
-	)
+	);
 }
