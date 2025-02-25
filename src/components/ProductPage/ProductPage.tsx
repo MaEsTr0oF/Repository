@@ -1,22 +1,35 @@
 import styles from './ProductPage.module.css';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import DeliveryInfo from './DeliveryInfo';
 import ImageModal from '../ImageModal/ImageModal';
 import PageTitle from '../PageTitle/PageTitle';
+import SEO from '../SEO/SEO';
+import { Helmet } from 'react-helmet-async';
 
+// Типы для компонента
+interface ProductData {
+    title: string;
+    description: string;
+    price: string;
+    article: string;
+    brand: string;
+    deliveryInfo: string;
+    productImage?: string;
+}
+
+// Тип рекомендуемого продукта
 interface Product {
     id: number;
     title: string;
     article: string;
     price: number;
     image: string;
-    manufacturer?: string;
-    text?: string;
+    manufacturer: string;
+    text: string;
 }
 
-// Типы вкладок
 type TabType = 'description' | 'delivery';
 
 const recommendedProducts: Product[] = [
@@ -60,58 +73,99 @@ const recommendedProducts: Product[] = [
 
 export default function ProductPage() {
     const location = useLocation();
-    const { addToCart } = useShop();
-    const [quantity, setQuantity] = useState(1);
+    const navigate = useNavigate();
+    const { id } = useParams<{ id: string }>();
+    const { demoProducts } = useShop();
+    
+    // Состояния
     const [activeTab, setActiveTab] = useState<TabType>('description');
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+    const [productData, setProductData] = useState<ProductData | null>(null);
     
-    // Получаем данные о товаре из state навигации или используем заглушку
-    const { title, price, productImage, description, deliveryInfo, article, brand } = location.state || {};
-    
-    // Добавляем PageTitle с динамическим заголовком товара
-    const pageTitle = title ? `${title} - КабельОпт` : 'Товар - КабельОпт';
-
-    const handleQuantityChange = (delta: number) => {
-        const newQuantity = quantity + delta;
-        if (newQuantity >= 1) {
-            setQuantity(newQuantity);
+    // Получаем данные о товаре
+    useEffect(() => {
+        if (id) {
+            // Находим продукт в списке всех продуктов
+            const productInfo = demoProducts.find(product => product.id === id);
+            
+            if (productInfo) {
+                // Если продукт найден, используем его данные
+                setProductData({
+                    title: productInfo.name,
+                    description: productInfo.text || `Подробное описание товара ${productInfo.name}. Характеристики и технические данные.`,
+                    price: productInfo.cost,
+                    article: productInfo.article || 'Н/Д',
+                    brand: 'КабельОпт',
+                    deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте.",
+                    productImage: productInfo.image
+                });
+            } else if (location.state) {
+                // Если продукт не найден, но есть данные в location.state
+                setProductData(location.state as ProductData);
+            } else {
+                // Если нет данных вообще, перенаправляем на каталог
+                navigate('/catalog', { replace: true });
+            }
         }
+    }, [id, location.state, demoProducts, navigate]);
+    
+    // Обработчики переключения вкладок
+    const handleDescriptionClick = () => {
+        setActiveTab('description');
     };
-
-    const handleAddToCart = () => {
-        // Используем данные из location.state или заглушки
-        const productId = location.state?.id || Math.random().toString(36).substr(2, 9);
-        const productTitle = title || "Наименование товара";
-        const productPrice = (price || 2990).toString();
-        const productImg = productImage || "/img/products/product.png";
-        const productCategory = location.state?.category || "Кабельная продукция";
-        
-        addToCart({
-            id: productId,
-            name: productTitle,
-            cost: productPrice,
-            image: productImg,
-            quantity: quantity,
-            category: productCategory
-        });
+    
+    const handleDeliveryClick = () => {
+        setActiveTab('delivery');
     };
-
+    
     const handleImageClick = () => {
         setIsImageModalOpen(true);
     };
-
-    // Проверяем наличие данных для вкладок
-    const hasDescription = !!description;
-    // Всегда показываем вкладку доставки, так как у нас есть стандартная информация
-    const hasDeliveryInfo = true;
-
-    // Если нет данных для активной вкладки, но есть для другой, переключаемся
-    if (!hasDescription && activeTab === 'description') {
-        setActiveTab('delivery');
+    
+    if (!productData) {
+        return <div className={styles.loading}>Загрузка товара...</div>;
     }
-
+    
+    // Определяем, нужно ли показывать вкладку с описанием
+    const hasDescription = !!productData.description;
+    const pageTitle = productData.title || 'Товар';
+    
     return (
         <div className={styles.productPage}>
+            <SEO 
+                title={productData.title}
+                description={`${productData.title} - ${productData.description.substring(0, 150)}...`}
+                keywords={`${productData.title}, купить ${productData.title}, ${productData.article}, кабельная продукция`}
+                ogImage={productData.productImage}
+                ogType="product"
+            />
+            
+            {/* Структурированные данные schema.org */}
+            <Helmet>
+                <script type="application/ld+json">
+                    {JSON.stringify({
+                        "@context": "https://schema.org/",
+                        "@type": "Product",
+                        "name": productData.title,
+                        "image": productData.productImage || "/img/products/product.png",
+                        "description": productData.description,
+                        "sku": productData.article,
+                        "brand": {
+                            "@type": "Brand",
+                            "name": productData.brand
+                        },
+                        "offers": {
+                            "@type": "Offer",
+                            "url": window.location.href,
+                            "priceCurrency": "RUB",
+                            "price": productData.price,
+                            "availability": "https://schema.org/InStock",
+                            "itemCondition": "https://schema.org/NewCondition"
+                        }
+                    })}
+                </script>
+            </Helmet>
+            
             <PageTitle title={pageTitle} />
             <div className={styles.container}>
                 <div className={styles.breadcrumbs}>
@@ -119,88 +173,59 @@ export default function ProductPage() {
                     <span>/</span>
                     <Link to="/catalog">Каталог</Link>
                     <span>/</span>
-                    <span>{title || 'Товар'}</span>
+                    <span>{productData.title}</span>
                 </div>
 
                 <div className={styles.productContent}>
                     <div className={styles.productImage}>
                         <img 
-                            src={productImage || "/img/products/product.png"} 
-                            alt={title || "Наименование товара"} 
+                            src={productData.productImage || "/img/products/product.png"} 
+                            alt={productData.title || "Наименование товара"} 
                             onClick={handleImageClick}
                             style={{ cursor: 'zoom-in' }}
                         />
                     </div>
 
                     <div className={styles.productInfo}>
-                        <div className={styles.brand}>{brand || 'Бренд'}</div>
-                        <h1>{title || "Наименование товара"}</h1>
-                        <div className={styles.article}>Артикул: {article || 'Н/Д'}</div>
-                        <div className={styles.price}>{price ? `${price} ₽` : "2990 ₽"}</div>
+                        <div className={styles.brand}>{productData.brand || 'Бренд'}</div>
+                        <h1>{productData.title || "Наименование товара"}</h1>
+                        <div className={styles.article}>Артикул: {productData.article || 'Н/Д'}</div>
+                        <div className={styles.price}>{productData.price ? `${productData.price} ₽` : "2990 ₽"}</div>
 
                         {/* Отображаем вкладки только если есть данные хотя бы для одной из них */}
-                        {(hasDescription || hasDeliveryInfo) && (
+                        {(hasDescription || productData.deliveryInfo) && (
                             <div className={styles.tabs}>
                                 {hasDescription && (
                                     <button 
-                                        className={`${styles.tab} ${activeTab === 'description' ? styles.active : ''}`}
-                                        onClick={() => setActiveTab('description')}
+                                        className={`${styles.tabButton} ${activeTab === 'description' ? styles.active : ''}`} 
+                                        onClick={handleDescriptionClick}
                                     >
                                         Описание
                                     </button>
                                 )}
-                                {hasDeliveryInfo && (
-                                    <button 
-                                        className={`${styles.tab} ${activeTab === 'delivery' ? styles.active : ''}`}
-                                        onClick={() => setActiveTab('delivery')}
-                                    >
-                                        Доставка и оплата
-                                    </button>
-                                )}
+                                <button 
+                                    className={`${styles.tabButton} ${activeTab === 'delivery' ? styles.active : ''}`} 
+                                    onClick={handleDeliveryClick}
+                                >
+                                    Доставка и оплата
+                                </button>
                             </div>
                         )}
 
-                        {/* Содержимое вкладок */}
+                        {/* Отображаем контент активной вкладки */}
                         {activeTab === 'description' && hasDescription && (
                             <div className={styles.description}>
-                                <p>{description}</p>
+                                <p>{productData.description}</p>
                             </div>
                         )}
                         
                         {activeTab === 'delivery' && (
-                            <DeliveryInfo customInfo={deliveryInfo} />
-                        )}
-
-                        {/* Если нет данных ни для одной вкладки, показываем сообщение */}
-                        {!hasDescription && !hasDeliveryInfo && (
-                            <div className={styles.description}>
-                                <p>Информация о товаре отсутствует</p>
-                            </div>
+                            <DeliveryInfo customInfo={productData.deliveryInfo} />
                         )}
 
                         <div className={styles.actions}>
-                            <div className={styles.quantity}>
-                                <button 
-                                    className={styles.minus} 
-                                    onClick={() => handleQuantityChange(-1)}
-                                    disabled={quantity <= 1}
-                                >
-                                    -
-                                </button>
-                                <input type="text" value={quantity} readOnly />
-                                <button 
-                                    className={styles.plus}
-                                    onClick={() => handleQuantityChange(1)}
-                                >
-                                    +
-                                </button>
-                            </div>
-                            <button 
-                                className={styles.addToCart}
-                                onClick={handleAddToCart}
-                            >
-                                В корзину
-                            </button>
+                            <button className={styles.addToCartButton}>Добавить в корзину</button>
+                            <button className={styles.addToFavoritesButton}>В избранное</button>
                         </div>
                     </div>
                 </div>
@@ -239,13 +264,13 @@ export default function ProductPage() {
                     </div>
                 </div>
             </div>
-
+            
             {/* Модальное окно для отображения изображения на весь экран */}
             <ImageModal 
                 isOpen={isImageModalOpen}
                 onClose={() => setIsImageModalOpen(false)}
-                imageUrl={productImage || "/img/products/product.png"}
-                altText={title || "Наименование товара"}
+                imageUrl={productData.productImage || "/img/products/product.png"}
+                altText={productData.title || "Наименование товара"}
             />
         </div>
     );

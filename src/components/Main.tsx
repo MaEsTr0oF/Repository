@@ -8,10 +8,16 @@ import MainPluses from './main/MainPluses/MainPluses.tsx'
 import MainDelyvery from './main/MainDelyvery/MainDelyvery.tsx'
 import MainContForm from './main/MainContForm/MainContForm.tsx'
 import PageTitle from './PageTitle/PageTitle.tsx'
+import SEO from './SEO/SEO'
 
 export default function Main(){
 	return(
-		<main>
+		<>
+			<SEO 
+				title="Главная" 
+				description="КабельОпт - ведущий поставщик кабельной продукции. Широкий ассортимент кабелей, проводов и электротехнических товаров по выгодным ценам с доставкой по всей России."
+				keywords="кабель, провод, электротехника, кабельная продукция, оптовые поставки, розничные продажи"
+			/>
 			<PageTitle title="Главная" />
 			<AppPresentation />
 			<Advantages />
@@ -22,6 +28,6 @@ export default function Main(){
 			<MainPluses />
 			<MainDelyvery />
 			<MainContForm />
-		</main>
+		</>
 	)
 }

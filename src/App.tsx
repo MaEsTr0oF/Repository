@@ -24,6 +24,7 @@ import Offer from "./components/Offer/Offer.tsx";
 import styles from './AppStyles.module.css';
 import { ShopProvider } from './context/ShopContext';
 import { PageTitleProvider } from './context/PageTitleContext';
+import { HelmetProvider } from 'react-helmet-async';
 
 // Компонент для отслеживания изменений маршрута
 function RouteChangeObserver({ children }: { children: React.ReactNode }) {
@@ -115,13 +116,15 @@ function AppLayout() {
 
 function App() {
 	return (
-		<PageTitleProvider defaultTitle="Интернет-магазин кабельной продукции" defaultSuffix="КабельОпт">
-			<Router>
-				<ShopProvider>
-					<AppLayout />
-				</ShopProvider>
-			</Router>
-		</PageTitleProvider>
+		<HelmetProvider>
+			<PageTitleProvider defaultTitle="Интернет-магазин кабельной продукции" defaultSuffix="КабельОпт">
+				<Router>
+					<ShopProvider>
+						<AppLayout />
+					</ShopProvider>
+				</Router>
+			</PageTitleProvider>
+		</HelmetProvider>
 	);
 }
 
