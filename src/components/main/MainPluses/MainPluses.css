@@ -20,7 +20,7 @@
  /* Сетка карточек */
  .pluses-grid {
 	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 	gap: 20px;
 	justify-content: center;
  }
@@ -57,15 +57,4 @@
  /* Текст карточки */
  .card-text {
 	font-size: 13px;
- }
- @media (max-width:900px) {
-	.pluses-grid{
-		display: flex;
-		flex-direction: column;
-	}
-	.card{
-		display: inline-block;
-		width: 220px;
-		margin:0 auto;
-	}
  }

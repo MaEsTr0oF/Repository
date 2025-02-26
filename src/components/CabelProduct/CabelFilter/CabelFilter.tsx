@@ -7,6 +7,7 @@ import ImageModal from '../../ImageModal/ImageModal';
 import styles from './CabelFilter.module.css';
 import PageTitle from '../../PageTitle/PageTitle';
 import CabelCatalog from '../CabelCatalog/CabelCatalog';
+import RequestProductModal from '../../RequestProductModal/RequestProductModal';
 
 // Импорт иконок
 import heartEmpty from '/img/header/heart.png';
@@ -41,6 +42,8 @@ const CabelFilter: React.FC = () => {
         category: false,
         sort: false
     });
+    const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     // Refs для анимации
     const cardRefs = useRef<{ [key: string]: HTMLDivElement }>({});
@@ -50,10 +53,17 @@ const CabelFilter: React.FC = () => {
     // Добавляем ref для секции фильтров
     const filterSectionRef = useRef<HTMLDivElement>(null);
 
-    // Получаем текущую категорию из URL
+    // Получаем текущую категорию из URL или localStorage
     const selectedCategory = useMemo(() => {
         const pathParts = location.pathname.split('/');
-        return pathParts[pathParts.length - 1] !== 'catalog' ? pathParts[pathParts.length - 1] : '';
+        const categoryFromUrl = pathParts[pathParts.length - 1] !== 'catalog' ? pathParts[pathParts.length - 1] : '';
+        
+        if (categoryFromUrl) {
+            localStorage.setItem('selectedCategory', categoryFromUrl);
+            return categoryFromUrl;
+        }
+        
+        return localStorage.getItem('selectedCategory') || '';
     }, [location.pathname]);
 
     const categories = useMemo<CategoryData[]>(() => [
@@ -94,6 +104,16 @@ const CabelFilter: React.FC = () => {
             description: "Надежное оборудование"
         }
     ], []);
+
+    // Эффект для применения сохраненной категории при загрузке
+    useEffect(() => {
+        const savedCategory = localStorage.getItem('selectedCategory');
+        if (savedCategory) {
+            updateFilter('category', savedCategory);
+            updateFilter('maxPrice', 20000);
+            applyFilters();
+        }
+    }, []);
 
     // Обработчики событий
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -147,17 +167,12 @@ const CabelFilter: React.FC = () => {
         }
     }, []);
 
-    const handleBackToCategories = () => {
-        resetFilters();
-        navigate('/catalog');
-        setShowCategorySelector(true);
-    };
-
     const handleResetFilters = () => {
         setSearchValue('');
         setPriceRange({ value: 20 });
         setActiveFilters({ search: false, price: false, category: false, sort: false });
         resetFilters();
+        localStorage.removeItem('selectedCategory'); // Очищаем сохраненную категорию
         if (selectedCategory) {
             updateFilter('category', selectedCategory);
             updateFilter('maxPrice', 20000);
@@ -165,9 +180,26 @@ const CabelFilter: React.FC = () => {
         applyFilters();
     };
 
+    const handleBackToCategories = () => {
+        resetFilters();
+        localStorage.removeItem('selectedCategory'); // Очищаем сохраненную категорию
+        navigate('/catalog');
+        setShowCategorySelector(true);
+    };
+
     const handleProductClick = (product: Product) => {
-        // Навигация на страницу товара
-        navigate(`/product/${product.id}`);
+        const prodcost = product.cost.replace('₽', '').trim();
+        navigate(`/product/${product.id}`, { 
+            state: { 
+                productImage: product.image, 
+                title: product.name, 
+                description: product.text || `Подробное описание товара ${product.name}. Характеристики и технические данные.`, 
+                price: prodcost,
+                article: product.id,
+                brand: 'КабельОпт',
+                deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте."
+            } 
+        });
     };
 
     const handleImageClick = (e: React.MouseEvent, imageUrl: string) => {
@@ -178,6 +210,14 @@ const CabelFilter: React.FC = () => {
 
     const handleAction = (e: React.MouseEvent, product: Product, type: 'cart' | 'compare') => {
         e.stopPropagation();
+        const isRequestPrice = product.cost === "0" || product.cost.toLowerCase().includes('запрос');
+        
+        if (isRequestPrice) {
+            setSelectedProduct(product);
+            setIsRequestModalOpen(true);
+            return;
+        }
+
         const cardElement = cardRefs.current[product.id];
         
         if (cardElement) {
@@ -207,6 +247,13 @@ const CabelFilter: React.FC = () => {
 
     const handleFavoriteClick = (e: React.MouseEvent, product: Product) => {
         e.stopPropagation();
+        const isRequestPrice = product.cost === "0" || product.cost.toLowerCase().includes('запрос');
+        
+        if (isRequestPrice) {
+            setSelectedProduct(product);
+            setIsRequestModalOpen(true);
+            return;
+        }
         addToFavorite(product);
     };
 
@@ -434,6 +481,15 @@ const CabelFilter: React.FC = () => {
                 onClose={() => setIsImageModalOpen(false)}
                 imageUrl={selectedImage}
                 altText="Изображение товара"
+            />
+
+            <RequestProductModal
+                isOpen={isRequestModalOpen}
+                onClose={() => {
+                    setIsRequestModalOpen(false);
+                    setSelectedProduct(null);
+                }}
+                productName={selectedProduct?.name || ''}
             />
         </div>
     );

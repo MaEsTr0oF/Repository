@@ -59,6 +59,7 @@ export default function CabelCatalog() {
 		resetFilters();
 		updateFilter('category', category);
 		updateFilter('maxPrice', 20000);
+		localStorage.setItem('selectedCategory', category);
 		const filterSection = document.getElementById('filter-section');
 		if (filterSection) {
 			filterSection.scrollIntoView({ 

@@ -1,12 +1,13 @@
 import styles from './ProductPage.module.css';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useShop } from '../../context/ShopContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import DeliveryInfo from './DeliveryInfo';
 import ImageModal from '../ImageModal/ImageModal';
 import PageTitle from '../PageTitle/PageTitle';
 import SEO from '../SEO/SEO';
 import { Helmet } from 'react-helmet-async';
+import RequestProductModal from '../RequestProductModal/RequestProductModal';
 
 // Типы для компонента
 interface ProductData {
@@ -38,7 +39,7 @@ const recommendedProducts: Product[] = [
         title: 'Силовой кабель',
         article: 'СК-1234567890',
         price: 10.26,
-        image: '/img/products/image1.png',
+        image: '/img/Cables/image1.jpg',
         manufacturer: 'Камкабель',
         text: 'Силовой кабель для промышленного использования. Высокая надежность и долговечность.'
     },
@@ -47,7 +48,7 @@ const recommendedProducts: Product[] = [
         title: 'Кабель управления',
         article: 'КУ-1234567890',
         price: 10.61,
-        image: '/img/products/image2.png',
+        image: '/img/Cables/image12.jpg',
         manufacturer: 'Uncomtech',
         text: 'Кабель управления для систем автоматизации. Устойчив к помехам и электромагнитным воздействиям.'
     },
@@ -56,7 +57,7 @@ const recommendedProducts: Product[] = [
         title: 'Монтажный универсальный кабель',
         article: 'МУК-1234567890',
         price: 10.03,
-        image: '/img/products/image3.png',
+        image: '/img/Cables/image-4.jpg',
         manufacturer: 'Спецкабельстрой',
         text: 'Универсальный монтажный кабель для различных типов соединений. Простота монтажа и надежность.'
     },
@@ -65,7 +66,7 @@ const recommendedProducts: Product[] = [
         title: 'Контрольный кабель',
         article: 'КК-1234567890',
         price: 10.17,
-        image: '/img/products/image4.png',
+        image: '/img/Cables/image-7.jpg',
         manufacturer: 'Кабель Москва',
         text: 'Контрольный кабель для систем мониторинга и управления. Высокая точность передачи сигнала.'
     }
@@ -75,12 +76,22 @@ export default function ProductPage() {
     const location = useLocation();
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
-    const { demoProducts } = useShop();
+    const { 
+        demoProducts, 
+        addToCart, 
+        addToFavorite, 
+        isInFavorites, 
+        removeFavorite 
+    } = useShop();
     
     // Состояния
     const [activeTab, setActiveTab] = useState<TabType>('description');
     const [isImageModalOpen, setIsImageModalOpen] = useState(false);
     const [productData, setProductData] = useState<ProductData | null>(null);
+    const [quantity, setQuantity] = useState(1);
+    const [isAddedToCart, setIsAddedToCart] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
     
     // Получаем данные о товаре
     useEffect(() => {
@@ -90,7 +101,7 @@ export default function ProductPage() {
             
             if (productInfo) {
                 // Если продукт найден, используем его данные
-                setProductData({
+                const data = {
                     title: productInfo.name,
                     description: productInfo.text || `Подробное описание товара ${productInfo.name}. Характеристики и технические данные.`,
                     price: productInfo.cost,
@@ -98,7 +109,9 @@ export default function ProductPage() {
                     brand: 'КабельОпт',
                     deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте.",
                     productImage: productInfo.image
-                });
+                };
+                setProductData(data);
+                setIsFavorite(isInFavorites(id));
             } else if (location.state) {
                 // Если продукт не найден, но есть данные в location.state
                 setProductData(location.state as ProductData);
@@ -107,7 +120,7 @@ export default function ProductPage() {
                 navigate('/catalog', { replace: true });
             }
         }
-    }, [id, location.state, demoProducts, navigate]);
+    }, [id, location.state, demoProducts, navigate, isInFavorites]);
     
     // Обработчики переключения вкладок
     const handleDescriptionClick = () => {
@@ -122,6 +135,62 @@ export default function ProductPage() {
         setIsImageModalOpen(true);
     };
     
+    const handleQuantityChange = useCallback((delta: number) => {
+        setQuantity(prev => Math.max(1, Math.min(99, prev + delta)));
+    }, []);
+
+    const isRequestPrice = useCallback(() => {
+        if (!productData?.price) return false;
+        return productData.price === "0" || 
+               productData.price.toLowerCase().includes('запрос') || 
+               productData.price === "по запросу";
+    }, [productData?.price]);
+
+    const handleAddToCart = useCallback(() => {
+        if (productData && id) {
+            if (isRequestPrice()) {
+                setIsRequestModalOpen(true);
+                return;
+            }
+
+            const product = {
+                id,
+                name: productData.title,
+                cost: productData.price,
+                quantity,
+                image: productData.productImage,
+                article: productData.article
+            };
+            addToCart(product);
+            setIsAddedToCart(true);
+            setTimeout(() => setIsAddedToCart(false), 2000);
+        }
+    }, [productData, id, quantity, addToCart, isRequestPrice]);
+
+    const handleFavoriteClick = useCallback(() => {
+        if (!productData || !id) return;
+
+        if (isRequestPrice()) {
+            setIsRequestModalOpen(true);
+            return;
+        }
+
+        if (isFavorite) {
+            removeFavorite(id);
+            setIsFavorite(false);
+        } else {
+            const product = {
+                id,
+                name: productData.title,
+                cost: productData.price,
+                image: productData.productImage,
+                article: productData.article
+            };
+            addToFavorite(product);
+            setIsFavorite(true);
+        }
+    }, [productData, id, isFavorite, removeFavorite, addToFavorite, isRequestPrice]);
+
     if (!productData) {
         return <div className={styles.loading}>Загрузка товара...</div>;
     }
@@ -190,42 +259,78 @@ export default function ProductPage() {
                         <div className={styles.brand}>{productData.brand || 'Бренд'}</div>
                         <h1>{productData.title || "Наименование товара"}</h1>
                         <div className={styles.article}>Артикул: {productData.article || 'Н/Д'}</div>
-                        <div className={styles.price}>{productData.price ? `${productData.price} ₽` : "2990 ₽"}</div>
+                        <div className={styles.price}>{productData.price || "2990 ₽"}</div>
 
                         {/* Отображаем вкладки только если есть данные хотя бы для одной из них */}
                         {(hasDescription || productData.deliveryInfo) && (
-                            <div className={styles.tabs}>
-                                {hasDescription && (
+                            <>
+                                <div className={styles.tabs}>
+                                    {hasDescription && (
+                                        <button 
+                                            className={`${styles.tabButton} ${activeTab === 'description' ? styles.active : ''}`} 
+                                            onClick={handleDescriptionClick}
+                                        >
+                                            Описание
+                                        </button>
+                                    )}
                                     <button 
-                                        className={`${styles.tabButton} ${activeTab === 'description' ? styles.active : ''}`} 
-                                        onClick={handleDescriptionClick}
+                                        className={`${styles.tabButton} ${activeTab === 'delivery' ? styles.active : ''}`} 
+                                        onClick={handleDeliveryClick}
                                     >
-                                        Описание
+                                        Доставка и оплата
                                     </button>
-                                )}
-                                <button 
-                                    className={`${styles.tabButton} ${activeTab === 'delivery' ? styles.active : ''}`} 
-                                    onClick={handleDeliveryClick}
-                                >
-                                    Доставка и оплата
-                                </button>
-                            </div>
-                        )}
-
-                        {/* Отображаем контент активной вкладки */}
-                        {activeTab === 'description' && hasDescription && (
-                            <div className={styles.description}>
-                                <p>{productData.description}</p>
-                            </div>
-                        )}
-                        
-                        {activeTab === 'delivery' && (
-                            <DeliveryInfo customInfo={productData.deliveryInfo} />
+                                </div>
+                                
+                                <div className={`${styles.tabContent} ${activeTab === 'description' ? styles.active : ''}`}>
+                                    <div className={styles.description}>
+                                        <p>{productData.description}</p>
+                                    </div>
+                                </div>
+                                
+                                <div className={`${styles.tabContent} ${activeTab === 'delivery' ? styles.active : ''}`}>
+                                    <DeliveryInfo customInfo={productData.deliveryInfo} />
+                                </div>
+                            </>
                         )}
 
                         <div className={styles.actions}>
-                            <button className={styles.addToCartButton}>Добавить в корзину</button>
-                            <button className={styles.addToFavoritesButton}>В избранное</button>
+                            <div className={styles.quantity}>
+                                <button 
+                                    onClick={() => handleQuantityChange(-1)}
+                                    disabled={quantity <= 1}
+                                >
+                                    -
+                                </button>
+                                <input 
+                                    type="number" 
+                                    value={quantity}
+                                    readOnly
+                                />
+                                <button 
+                                    onClick={() => handleQuantityChange(1)}
+                                    disabled={quantity >= 99}
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            <div className={styles.actionButtons}>
+                                <button 
+                                    className={`${styles.addToCart} ${isAddedToCart ? styles.added : ''}`}
+                                    onClick={handleAddToCart}
+                                >
+                                    {isAddedToCart ? 'Добавлено ✓' : 'Добавить в корзину'}
+                                </button>
+                                <button 
+                                    className={`${styles.favoriteButton} ${isFavorite ? styles.active : ''}`}
+                                    onClick={handleFavoriteClick}
+                                    aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
+                                >
+                                    <svg viewBox="0 0 24 24">
+                                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -271,6 +376,12 @@ export default function ProductPage() {
                 onClose={() => setIsImageModalOpen(false)}
                 imageUrl={productData.productImage || "/img/products/product.png"}
                 altText={productData.title || "Наименование товара"}
+            />
+            
+            <RequestProductModal
+                isOpen={isRequestModalOpen}
+                onClose={() => setIsRequestModalOpen(false)}
+                productName={productData?.title || ''}
             />
         </div>
     );

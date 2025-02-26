@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styles from './Burger.module.css';
+import { useShop } from '../../context/ShopContext';
 
 export const Burger = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cartItems, compareItems, favorites } = useShop();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
     document.body.style.overflow = !isOpen ? 'hidden' : 'auto';
+  };
+
+  const getCartCount = () => {
+    return cartItems.reduce((total, item) => total + (item.quantity || 1), 0);
   };
 
   return (
@@ -37,11 +43,35 @@ export const Burger = () => {
             onClick={toggleMenu}
             aria-label="Закрыть меню"
           >
-				<span></span>
+            <span></span>
           </button>
         </div>
 
         <div className={styles.menuContent}>
+          <div className={styles.menuSection}>
+            <h3>Личный кабинет</h3>
+            <ul className={styles.userActions}>
+              <li>
+                <Link to="/cart" onClick={toggleMenu} className={styles.actionLink}>
+                  Корзина
+                  {getCartCount() > 0 && <span className={styles.badge}>{getCartCount()}</span>}
+                </Link>
+              </li>
+              <li>
+                <Link to="/favorites" onClick={toggleMenu} className={styles.actionLink}>
+                  Отложенные
+                  {favorites.length > 0 && <span className={styles.badge}>{favorites.length}</span>}
+                </Link>
+              </li>
+              <li>
+                <Link to="/compare" onClick={toggleMenu} className={styles.actionLink}>
+                  Сравнение
+                  {compareItems.length > 0 && <span className={styles.badge}>{compareItems.length}</span>}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
           <div className={styles.menuSection}>
             <h3>Каталог</h3>
             <ul>

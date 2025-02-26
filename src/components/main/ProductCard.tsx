@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AddToCartAnimation from '../AddToCartAnimation/AddToCartAnimation';
+import RequestProductModal from '../RequestProductModal/RequestProductModal';
 import styles from './ProductCard.module.css';
 import { useShop, Product, FavoriteProduct } from '../../context/ShopContext';
 import image from '/img/header/heart.png'
@@ -15,17 +16,19 @@ interface Props {
 
 export default function ProductCard({imagesrc, label, text, cost}: Props) {
 	const navigate = useNavigate();
-	const { addToCart, addToCompare, addToFavorite, isInFavorites } = useShop();
+	const { addToCart, addToCompare, addToFavorite, isInFavorites, removeFavorite } = useShop();
 	const cardRef = useRef<HTMLDivElement>(null);
 	const [isAnimating, setIsAnimating] = useState(false);
+	const [isRequestModalOpen, setIsRequestModalOpen] = useState(false);
 	const [animationConfig, setAnimationConfig] = useState<{
 		startPosition: { x: number; y: number };
 		endPosition: { x: number; y: number };
 		type: 'cart' | 'compare';
 	} | null>(null);
 
-	// Создаем объекты, соответствующие ожидаемым типам
-	const productId = `product_${Date.now()}`;
+	// Создаем стабильный ID на основе характеристик товара
+	const productId = `${label}_${cost}`.replace(/\s+/g, '_').toLowerCase();
+	
 	const productData: Product = { 
 		id: productId, 
 		name: label, 
@@ -43,14 +46,34 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 	};
 
 	const isFavorite = isInFavorites(productId);
+	const isRequestPrice = cost === "0" || cost.toLowerCase().includes('запрос');
 
 	const handleClick = () => {
-		navigate('/product/1', { state: { productImage: imagesrc, title: label, description: text, price: cost } });
+		const prodcost = isRequestPrice ? "по запросу" : cost.replace('₽', '').trim();
+		navigate(`/product/${productId}`, { 
+			state: { 
+				productImage: imagesrc, 
+				title: label, 
+				description: text, 
+				price: prodcost,
+				article: productId,
+				brand: 'КабельОпт',
+				deliveryInfo: "Доставка осуществляется по всей России. Оплата при получении или онлайн на сайте."
+			} 
+		});
 	};
 
 	const handleFavoriteClick = (e: React.MouseEvent) => {
 		e.stopPropagation();
-		addToFavorite(favoriteData);
+		if (isRequestPrice) {
+			setIsRequestModalOpen(true);
+			return;
+		}
+		if (isFavorite) {
+			removeFavorite(productId);
+		} else {
+			addToFavorite(favoriteData);
+		}
 	};
 
 	const getTargetPosition = (type: 'cart' | 'compare') => {
@@ -71,6 +94,10 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 
 	const handleAddToCart = (e: React.MouseEvent, type: 'cart' | 'compare') => {
 		e.stopPropagation();
+		if (isRequestPrice) {
+			setIsRequestModalOpen(true);
+			return;
+		}
 		if (!cardRef.current) return;
 
 		const rect = cardRef.current.getBoundingClientRect();
@@ -185,6 +212,12 @@ export default function ProductCard({imagesrc, label, text, cost}: Props) {
 					onComplete={() => setIsAnimating(false)}
 				/>
 			)}
+
+			<RequestProductModal
+				isOpen={isRequestModalOpen}
+				onClose={() => setIsRequestModalOpen(false)}
+				productName={label}
+			/>
 		</>
 	);
 }

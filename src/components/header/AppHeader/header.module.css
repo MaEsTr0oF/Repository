@@ -81,13 +81,13 @@
 	border-radius: 8px;
 	overflow: hidden;
 	width: 100%; /* Можно изменить в зависимости от макета */
-	/* max-width: 400px; Максимальная ширина */
+	max-width: 600px; /* Максимальная ширина */
  }
  
  /* Стили для поля ввода */
  .header_search input {
 	flex: 1;
-	padding: 6px;
+	padding: 10px;
 	border: none;
 	outline: none;
 	font-size: 16px;
@@ -98,7 +98,7 @@
  .header_search button {
 	background-color: #4CAF50; /* Зелёный цвет */
 	border: none;
-	padding: 10px 15px;
+	padding: 15px 15px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
