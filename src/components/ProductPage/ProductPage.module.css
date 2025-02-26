@@ -503,6 +503,7 @@
     .productContent {
         grid-template-columns: 1fr;
         gap: 40px;
+		  padding: 0;
     }
 
     .recommendedProducts {
@@ -512,7 +513,7 @@
 
 @media (max-width: 768px) {
     .container {
-        padding: 0 15px;
+        padding: 0 0px;
     }
 
     .productImage {
@@ -543,20 +544,22 @@
     }
 
     .actions {
-        flex-direction: column;
+		padding: 0 0px;
+      
+		  align-items: center;
     }
 
     .quantity {
-        width: 100%;
+        width: 150px;
     }
 
     .recommendedProducts {
         grid-template-columns: repeat(2, 1fr);
-        padding: 0 20px;
+        padding: 0 0px;
     }
 
     .actionButtons {
-        flex-direction: column;
+        
     }
 
     .addToCart {
@@ -564,7 +567,7 @@
     }
 
     .favoriteButton {
-        width: 100%;
+        
         height: 48px;
     }
 }
@@ -581,6 +584,9 @@
     .tabButton {
         min-width: 100%;
     }
+	 .quantity {
+		width: 120px;
+  }
 }
 
 .deliveryInfo {
