@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
 
 // Типы и интерфейсы
 export interface Product {
@@ -47,10 +47,9 @@ export interface ShopContextType {
     clearFavorites: () => void;
     filteredProducts: Product[];
     searchProducts: (query: string) => void;
-    updateFilter: (key: keyof FilterOptions, value: string | number) => void;
+    updateFilter: (key: keyof FilterOptions, value: string | number | undefined) => void;
     resetFilters: () => void;
     filterOptions: FilterOptions;
-    sortProducts: (sortType: SortType) => void;
     applyFilters: () => void;
     demoProducts: Product[];
 }
@@ -69,118 +68,192 @@ export const useShop = (): ShopContextType => {
 
 // Пример данных товаров для демонстрации
 const demoProducts: Product[] = [
-    // Добавляем все товары из AppCables
     {
-        id: "cable9",
+        id: "1",
         name: "Силовой кабель",
-        cost: "10.26 ₽",
-        manufacturer: "Камкабель",
-        category: "power",
-        image: "/img/Cables/image1.jpg"
+        cost: "10.260 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR001",
+        image: "/img/Cables/image1.jpg",
+        text: "Для передачи и распределения электроэнергии"
     },
     {
-        id: "cable10",
+        id: "2",
         name: "Кабель управления",
-        cost: "10.61 ₽",
-        manufacturer: "Uncomtech",
-        category: "control",
-        image: "/img/Cables/image12.jpg"
+        cost: "10.610 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR002",
+        image: "/img/Cables/image12.jpg",
+        text: "Для автоматизированных систем и управления технологическими процессами"
     },
     {
-        id: "cable11",
+        id: "3",
         name: "Монтажный универсальный кабель",
-        cost: "10.03 ₽",
-        manufacturer: "Спецкабельстрой",
-        category: "universal",
-        image: "/img/Cables/image-4.jpg"
+        cost: "10.030 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR003",
+        image: "/img/Cables/image-4.jpg",
+        text: "Универсальное решение для прокладки в различных условиях"
     },
     {
-        id: "cable12",
+        id: "4",
         name: "Контрольный кабель",
-        cost: "10.17 ₽",
-        manufacturer: "Кабель Москва",
-        category: "control",
-        image: "/img/Cables/image-7.jpg"
+        cost: "10.170 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR004",
+        image: "/img/Cables/image-7.jpg",
+        text: "Для передачи сигналов управления и контроля"
     },
     {
-        id: "cable13",
+        id: "5",
         name: "Кабель сигнализации и блокировки",
-        cost: "10.11 ₽",
-        manufacturer: "Камкабель",
-        category: "signal",
-        image: "/img/Cables/image.jpg"
+        cost: "10.110 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR005",
+        image: "/img/Cables/image.jpg",
+        text: "Для систем охранной и пожарной сигнализации"
     },
     {
-        id: "cable14",
+        id: "6",
         name: "Оптический кабель",
-        cost: "0 ₽",
-        manufacturer: "Uncomtech",
-        category: "optical",
-        image: "/img/Cables/image-2.jpg"
+        cost: "По запросу",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR006",
+        image: "/img/Cables/image-2.jpg",
+        text: "Для высокоскоростной передачи данных"
     },
     {
-        id: "cable15",
+        id: "7",
         name: "Судовой кабель",
-        cost: "10.2 ₽",
-        manufacturer: "Спецкабельстрой",
-        category: "marine",
-        image: "/img/Cables/image-5.jpg"
+        cost: "10.200 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR007",
+        image: "/img/Cables/image-5.jpg",
+        text: "Для судостроения и эксплуатации в условиях повышенной влажности"
     },
     {
-        id: "cable16",
+        id: "8",
         name: "Симметричный кабель",
-        cost: "10.21 ₽",
-        manufacturer: "Кабель Москва",
-        category: "symmetric",
-        image: "/img/Cables/image-8.jpg"
+        cost: "10.210 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR008",
+        image: "/img/Cables/image-8.jpg",
+        text: "Для передачи низкочастотных сигналов"
     },
     {
-        id: "cable17",
+        id: "9",
         name: "Кабель местной связи",
-        cost: "10.53 ₽",
-        manufacturer: "Камкабель",
-        category: "local",
-        image: "/img/Cables/image-1.jpg"
+        cost: "10.530 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR009",
+        image: "/img/Cables/image-1.jpg",
+        text: "Для телефонных сетей и передачи сигналов"
     },
     {
-        id: "cable18",
+        id: "10",
         name: "Телефонный кабель",
-        cost: "11.32 ₽",
-        manufacturer: "Uncomtech",
-        category: "phone",
-        image: "/img/Cables/image-3.jpg"
+        cost: "11.320 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR010",
+        image: "/img/Cables/image-3.jpg",
+        text: "Для передачи голоса и данных"
     },
     {
-        id: "cable19",
+        id: "11",
         name: "Коаксиальный кабель",
-        cost: "10.37 ₽",
-        manufacturer: "Спецкабельстрой",
-        category: "coaxial",
-        image: "/img/Cables/image-6.jpg"
+        cost: "10.370 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR011",
+        image: "/img/Cables/image-6.jpg",
+        text: "Для передачи телевизионных сигналов и интернета"
     },
     {
-        id: "cable20",
+        id: "12",
         name: "Кабель из полимерных композиций",
-        cost: "14.4 ₽",
-        manufacturer: "Кабель Москва",
-        category: "polymer",
-        image: "/img/Cables/image-9.jpg"
+        cost: "14.400 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR012",
+        image: "/img/Cables/image-9.jpg",
+        text: "Для сложных эксплуатационных условий"
     },
     {
-        id: "cable21",
+        id: "13",
         name: "Lan-кабель",
-        cost: "10.1 ₽",
-        manufacturer: "Камкабель",
-        category: "lan",
-        image: "/img/Cables/image-10.jpg"
+        cost: "10.100 ₽",
+        manufacturer: "Конкорд",
+        category: "Кабель",
+        label: "Кабель",
+        article: "PR013",
+        image: "/img/Cables/image-10.jpg",
+        text: "Для компьютерных сетей"
     },
     {
-        id: "cable22",
+        id: "14",
         name: "Провод",
-        cost: "10.03 ₽",
-        manufacturer: "Uncomtech",
-        category: "wire",
-        image: "/img/Cables/image-11.jpg"
+        cost: "10.030 ₽",
+        manufacturer: "Конкорд",
+        category: "Провод",
+        label: "Провод",
+        article: "PR014",
+        image: "/img/Cables/image-11.jpg",
+        text: "Для подключения электрических приборов"
+    },
+    {
+        id: "15",
+        name: "Низковольтное оборудование",
+        cost: "По запросу",
+        manufacturer: "ElectroTech",
+        category: "Низковольтное оборудование",
+        label: "Низковольтное оборудование",
+        article: "ET001",
+        image: "/img/Electric/image.jpg",
+        text: "Автоматические выключатели, УЗО, реле"
+    },
+    {
+        id: "16",
+        name: "Системы безопасности",
+        cost: "По запросу",
+        manufacturer: "SecureTech",
+        category: "Системы безопасности",
+        label: "Системы безопасности",
+        article: "ST001",
+        image: "/img/Electric/image1.jpg",
+        text: "Оборудование для охранной и пожарной сигнализации"
+    },
+    {
+        id: "17",
+        name: "Материалы для прокладки кабеля",
+        cost: "По запросу",
+        manufacturer: "CableTech",
+        category: "Материалы для прокладки кабеля",
+        label: "Материалы для прокладки кабеля",
+        article: "MT001",
+        image: "/img/Electric/image2.jpg",
+        text: "Кабель-каналы, лотки, крепежи"
     }
 ];
 
@@ -209,155 +282,114 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
     });
     const [filteredProducts, setFilteredProducts] = useState<Product[]>(demoProducts);
     
-    // Применение фильтров к товарам
-    const applyFilters = () => {
+    // Поиск товаров
+    const searchProducts = (query: string) => {
+        setFilterOptions(prev => {
+            const newOptions = { ...prev, searchQuery: query };
+            const filtered = applyFiltersWithOptions(newOptions);
+            setFilteredProducts(filtered);
+            return newOptions;
+        });
+    };
+    
+    // Обновление отдельного фильтра
+    const updateFilter = (key: keyof FilterOptions, value: string | number | undefined) => {
+        setFilterOptions(prev => {
+            const newOptions = { ...prev, [key]: value };
+            
+            // Если обновляется категория, сбрасываем поисковый запрос и сортировку
+            if (key === 'category') {
+                newOptions.searchQuery = '';
+                newOptions.sortType = undefined;
+            }
+            
+            const filtered = applyFiltersWithOptions(newOptions);
+            setFilteredProducts(filtered);
+            return newOptions;
+        });
+    };
+
+    // Применение фильтров
+    const applyFilters = useCallback(() => {
+        setFilteredProducts(applyFiltersWithOptions(filterOptions));
+    }, [filterOptions]);
+
+    // Вспомогательная функция для применения фильтров
+    const applyFiltersWithOptions = (options: FilterOptions) => {
         let filtered = [...demoProducts];
         
         // Фильтрация по цене
-        if (filterOptions.minPrice !== undefined || filterOptions.maxPrice !== undefined) {
+        if (options.maxPrice !== undefined) {
             filtered = filtered.filter(product => {
-                const price = parseFloat(product.cost.replace(/[^\d.-]/g, ''));
-                return (
-                    (filterOptions.minPrice === undefined || price >= filterOptions.minPrice) &&
-                    (filterOptions.maxPrice === undefined || price <= filterOptions.maxPrice)
+                if (product.cost === "По запросу") return true;
+                const price = parseFloat(product.cost.replace(/[^\d.]/g, '')) * 1000;
+                return price <= options.maxPrice!;
+            });
+        }
+        
+        // Фильтрация по категории
+        if (options.category) {
+            filtered = filtered.filter(product => 
+                product.category?.toLowerCase() === options.category?.toLowerCase()
+            );
+        }
+        
+        // Фильтрация по поисковому запросу
+        if (options.searchQuery) {
+            const query = options.searchQuery.toLowerCase();
+            filtered = filtered.filter(product => {
+                const searchFields = [
+                    product.name,
+                    product.label,
+                    product.manufacturer,
+                    product.category,
+                    product.article,
+                    product.text
+                ];
+                
+                return searchFields.some(field => 
+                    field && field.toLowerCase().includes(query)
                 );
             });
         }
         
-        // Фильтрация по категории - проверяем как category, так и label
-        if (filterOptions.category) {
-            filtered = filtered.filter(product => {
-                // Проверяем по полю category
-                const matchesCategory = product.category === filterOptions.category;
+        // Сортировка
+        if (options.sortType) {
+            filtered.sort((a, b) => {
+                const priceA = parseFloat(a.cost.replace(/[^\d.-]/g, ''));
+                const priceB = parseFloat(b.cost.replace(/[^\d.-]/g, ''));
                 
-                // Проверяем по полю label (если оно есть)
-                const matchesLabel = product.label === filterOptions.category;
-                
-                // Также проверяем, содержится ли категория в имени продукта
-                const matchesName = product.name && product.name.includes(filterOptions.category || '');
-                
-                return matchesCategory || matchesLabel || matchesName;
+                switch (options.sortType) {
+                    case 'price-asc':
+                        return priceA - priceB;
+                    case 'price-desc':
+                        return priceB - priceA;
+                    case 'name-asc':
+                        return (a.label || a.name).localeCompare(b.label || b.name);
+                    case 'name-desc':
+                        return (b.label || b.name).localeCompare(a.label || a.name);
+                    default:
+                        return 0;
+                }
             });
         }
         
-        // Фильтрация по поисковому запросу - проверяем по всем возможным полям
-        if (filterOptions.searchQuery) {
-            const query = filterOptions.searchQuery.toLowerCase();
-            filtered = filtered.filter(product => 
-                // Проверка имени
-                (product.name && product.name.toLowerCase().includes(query)) ||
-                // Проверка категории
-                (product.category && product.category.toLowerCase().includes(query)) ||
-                // Проверка label, если он есть
-                (product.label && product.label.toLowerCase().includes(query)) ||
-                // Проверка артикула
-                (product.article && product.article.toLowerCase().includes(query))
-            );
-        }
-        
-        // Сортировка
-        if (filterOptions.sortType) {
-            switch (filterOptions.sortType) {
-                case 'price-asc':
-                    filtered.sort((a, b) => {
-                        const priceA = parseFloat(a.cost.replace(/[^\d.-]/g, ''));
-                        const priceB = parseFloat(b.cost.replace(/[^\d.-]/g, ''));
-                        return priceA - priceB;
-                    });
-                    break;
-                case 'price-desc':
-                    filtered.sort((a, b) => {
-                        const priceA = parseFloat(a.cost.replace(/[^\d.-]/g, ''));
-                        const priceB = parseFloat(b.cost.replace(/[^\d.-]/g, ''));
-                        return priceB - priceA;
-                    });
-                    break;
-                case 'name-asc':
-                    filtered.sort((a, b) => a.name.localeCompare(b.name));
-                    break;
-                case 'name-desc':
-                    filtered.sort((a, b) => b.name.localeCompare(a.name));
-                    break;
-            }
-        }
-        
-        setFilteredProducts(filtered);
-    };
-    
-    // Поиск товаров
-    const searchProducts = (query: string) => {
-        setFilterOptions(prev => ({ ...prev, searchQuery: query }));
-    };
-    
-    // Обновление отдельного фильтра
-    const updateFilter = (key: keyof FilterOptions, value: string | number) => {
-        setFilterOptions(prev => ({ ...prev, [key]: value }));
+        return filtered;
     };
     
     // Сброс фильтров
     const resetFilters = () => {
-        // Проверяем, отличаются ли текущие значения от сбрасываемых
-        const shouldReset = 
-            filterOptions.category !== '' || 
-            filterOptions.searchQuery !== '' ||
-            filterOptions.sortType !== '' ||
-            filterOptions.minPrice !== 0 ||
-            filterOptions.maxPrice !== 10000;
+        const defaultOptions: FilterOptions = {
+            minPrice: 0,
+            maxPrice: 10000,
+            category: '',
+            searchQuery: '',
+            sortType: undefined
+        };
         
-        if (shouldReset) {
-            // Обновляем только если есть реальное изменение
-            setFilterOptions({
-                minPrice: 0,
-                maxPrice: 10000,
-                category: '',
-                searchQuery: '',
-                sortType: ''
-            });
-            
-            // Обновляем отфильтрованные товары напрямую, 
-            // чтобы не ждать срабатывания эффекта
-            setFilteredProducts(demoProducts);
-        }
+        setFilterOptions(defaultOptions);
+        setFilteredProducts(applyFiltersWithOptions(defaultOptions));
     };
-    
-    // Сортировка товаров
-    const sortProducts = (sortType: SortType) => {
-        setFilterOptions(prev => ({
-            ...prev,
-            sortType
-        }));
-
-        const filtered = [...filteredProducts];
-
-        switch (sortType) {
-            case 'price-asc':
-                filtered.sort((a, b) => parseFloat(a.cost.replace(/[^\d.,]/g, '').replace(',', '.')) - parseFloat(b.cost.replace(/[^\d.,]/g, '').replace(',', '.')));
-                break;
-            case 'price-desc':
-                filtered.sort((a, b) => parseFloat(b.cost.replace(/[^\d.,]/g, '').replace(',', '.')) - parseFloat(a.cost.replace(/[^\d.,]/g, '').replace(',', '.')));
-                break;
-            case 'name-asc':
-                filtered.sort((a, b) => a.name.localeCompare(b.name));
-                break;
-            case 'name-desc':
-                filtered.sort((a, b) => b.name.localeCompare(a.name));
-                break;
-            default:
-                break;
-        }
-
-        setFilteredProducts(filtered);
-    };
-    
-    // Применяем фильтры при изменении опций фильтрации
-    useEffect(() => {
-        // Предотвращаем бесконечные циклы вызовов
-        const timer = setTimeout(() => {
-            applyFilters();
-        }, 0);
-        
-        return () => clearTimeout(timer);
-    }, [filterOptions]);
     
     // Загрузка данных из localStorage при инициализации
     useEffect(() => {
@@ -618,7 +650,6 @@ export const ShopProvider: React.FC<ShopProviderProps> = ({ children }) => {
                 updateFilter,
                 resetFilters,
                 filterOptions,
-                sortProducts,
                 applyFilters,
                 demoProducts
             }}

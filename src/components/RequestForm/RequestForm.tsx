@@ -82,7 +82,7 @@ export default function RequestForm({ isOpen, onClose }: RequestFormProps) {
                 placeholder="Ваше сообщение"
                 value={formData.comment}
                 onChange={handleChange}
-                required
+
                 className={styles.textarea}
               />
             </div>

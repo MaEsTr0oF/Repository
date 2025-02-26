@@ -1,140 +1,97 @@
-import styles from "./CabelCatalog.module.css"
-import image2 from "/img/CabelCatalog/image-11.jpg"
-import image1 from "/img/CabelCatalog/image13.png"
-import image from "/img/CabelCatalog/image1.png"
-import image4 from "/img/CabelCatalog/image.jpg"
-import image5 from "/img/CabelCatalog/image2.png"
-import image6 from "/img/CabelCatalog/image3.png"
-import PageTitle from "../../PageTitle/PageTitle"
-import { useNavigate } from "react-router-dom"
-import React, { useMemo, useCallback } from "react"
+import { useShop } from '../../../context/ShopContext';
+import styles from './CabelCatalog.module.css';
+import { CategoryData } from '../../../types/shop.types';
+import PageTitle from '../../PageTitle/PageTitle';
+import { useMemo } from 'react';
 
-interface CategoryData {
-	image: string;
-	label: string;
-	category: string;
-	description: string;
-}
+// Импорт изображений
+import cabelImage from '/img/CabelCatalog/image13.png';
+import provodImage from '/img/CabelCatalog/image-11.jpg';
+import svetImage from '/img/CabelCatalog/image1.png';
+import lowVoltageImage from '/img/CabelCatalog/image.jpg';
+import image2 from '/img/CabelCatalog/image2.png';
+import image3 from '/img/CabelCatalog/image3.png';
 
-// Выносим Card в отдельный мемоизированный компонент с проверкой равенства пропсов
-const Card = React.memo(function Card({
-	image, 
-	label, 
-	category, 
-	description, 
-	onClick
-}: CategoryData & { onClick: (category: string) => void }) {
-	// Используем локальное состояние для обработки клика
-	const handleClick = useCallback(() => {
-		onClick(category);
-	}, [category, onClick]);
-	
-	return(
-		<div 
-			className={styles.card} 
-			onClick={handleClick}
-			style={{ cursor: 'pointer' }}
-			role="button"
-			aria-label={`Категория ${label}`}
-		>
-			<img 
-				className={styles.image} 
-				src={image} 
-				alt={label} 
-				loading="lazy"
-			/>
-			<div className={styles.cardContent}>
-				<h2>{label}</h2>
-				<p className={styles.description}>{description}</p>
-			</div>
-		</div>
-	)
-}, (prevProps, nextProps) => {
-	// Проверяем, изменились ли пропсы
-	return (
-		prevProps.category === nextProps.category &&
-		prevProps.label === nextProps.label &&
-		prevProps.image === nextProps.image &&
-		prevProps.description === nextProps.description &&
-		prevProps.onClick === nextProps.onClick
-	);
-});
+export default function CabelCatalog() {
+	const { resetFilters, updateFilter, applyFilters } = useShop();
 
-export default function CabelCatalog(){
-	const navigate = useNavigate();
-	
-	// Данные о категориях - используем useMemo для предотвращения ненужных перерендеров
 	const categories = useMemo<CategoryData[]>(() => [
 		{
-			image: image1,
+			image: cabelImage,
 			label: "Кабель",
 			category: "Кабель",
 			description: "Широкий выбор кабельной продукции для различных нужд"
 		},
 		{
-			image: image2,
+			image: provodImage,
 			label: "Провод",
 			category: "Провод",
 			description: "Провода различного сечения и назначения"
 		},
 		{
-			image: image,
+			image: svetImage,
 			label: "Свет",
 			category: "Свет",
-			description: "Осветительные приборы и аксессуары для дома и офиса"
+			description: "Осветительные приборы"
 		},
 		{
-			image: image4,
+			image: lowVoltageImage,
 			label: "Низковольтное оборудование",
 			category: "Низковольтное оборудование",
-			description: "Надежное низковольтное оборудование для электросетей"
+			description: "Надежное оборудование"
 		},
 		{
-			image: image5,
+			image: image2,
 			label: "Системы безопасности",
 			category: "Системы безопасности",
-			description: "Современные системы безопасности и видеонаблюдения"
+			description: "Надежное оборудование"
 		},
 		{
-			image: image6,
+			image: image3,
 			label: "Материалы для прокладки кабеля",
 			category: "Материалы для прокладки кабеля",
-			description: "Все необходимое для качественной прокладки кабеля"
+			description: "Надежное оборудование"
 		}
+
 	], []);
-	
-	const handleCategoryClick = useCallback((category: string) => {
-		// Переходим на страницу категории
-		// Фильтры будут сброшены и применены компонентом CategoryPage
-		const encodedCategory = encodeURIComponent(category);
-		
-		// Используем navigate без replace для правильной работы истории браузера
-		navigate(`/catalog/${encodedCategory}`);
-	}, [navigate]);
-	
-	// Мемоизируем рендеринг карточек
-	const categoryCards = useMemo(() => {
-		return categories.map((category, index) => (
-			<Card 
-				key={`category-${category.category}-${index}`}
-				image={category.image}
-				label={category.label}
-				category={category.category}
-				description={category.description}
-				onClick={handleCategoryClick}
-			/>
-		));
-	}, [categories, handleCategoryClick]);
-	
-	return(
+
+	const handleCategoryClick = (category: string) => {
+		resetFilters();
+		updateFilter('category', category);
+		updateFilter('maxPrice', 20000);
+		const filterSection = document.getElementById('filter-section');
+		if (filterSection) {
+			filterSection.scrollIntoView({ 
+				behavior: 'smooth',
+				block: 'start'
+			});
+		}
+		applyFilters();
+	};
+
+	return (
 		<div className={styles.cabel}>
 			<PageTitle title="Кабельная продукция" />
 			<h2 className={styles.sectionTitle}>
-				Кабельная продукция 
+				Кабельная продукция
 			</h2>
 			<div className={styles.products}>
-				{categoryCards}
+				{categories.map((category, index) => (
+					<div 
+						key={index} 
+						className={styles.card}
+						onClick={() => handleCategoryClick(category.label)}
+					>
+						<div className={styles.image}>
+							<img src={category.image} alt={category.label} />
+						</div>
+						<div className={styles.cardContent}>
+							<h2>{category.label}</h2>
+							<p className={styles.description}>{category.description}</p>
+						</div>
+					</div>
+				))}
 			</div>
 		</div>
-	)
+	);
 }
