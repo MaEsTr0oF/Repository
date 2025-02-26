@@ -8,7 +8,7 @@ interface PaymentModalProps {
 }
 
 type PaymentMethod = 'sbp' | 'card';
-type Bank = 'sber' | 'alfa' | 'tinkoff' | 'vtb' | 'raif';
+type Bank = 'sber' | 'alfa' | 'tinkoff' | 'vtb' ;
 
 interface CardData {
     number: string;
@@ -22,7 +22,7 @@ const banks = [
     { id: 'alfa', name: 'Альфа-Банк', logo: '/img/banks/alfa.svg' },
     { id: 'tinkoff', name: 'Тинькофф', logo: '/img/banks/tinkoff.svg' },
     { id: 'vtb', name: 'ВТБ', logo: '/img/banks/vtb.svg' },
-    { id: 'raif', name: 'Райффайзен', logo: '/img/banks/raif.svg' }
+
 ];
 
 export default function PaymentModal({ isOpen, onClose, totalAmount }: PaymentModalProps) {
