@@ -5,10 +5,12 @@ import { useState } from 'react';
 import image from '/img/header/heart.png'
 import image1 from '/img/header/heart1.png'
 import PageTitle from '../PageTitle/PageTitle';
+import PaymentModal from '../PaymentModal/PaymentModal';
 
 export default function Cart() {
     const { cartItems, removeFromCart, updateQuantity, addToFavorite, isInFavorites } = useShop();
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
+    const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
 
     const handleSelectAll = () => {
         if (selectedItems.length === cartItems.length) {
@@ -180,7 +182,10 @@ export default function Cart() {
                                     <span>Товары ({getTotalItemsCount()})</span>
                                     <span>{calculateTotal().toFixed(2)} ₽</span>
                                 </div>
-                                <button className={styles.checkoutButton}>
+                                <button 
+                                    className={styles.checkoutButton}
+                                    onClick={() => setIsPaymentModalOpen(true)}
+                                >
                                     Оформить заказ
                                 </button>
                             </div>
@@ -198,6 +203,12 @@ export default function Cart() {
                     )}
                 </div>
             </div>
+
+            <PaymentModal 
+                isOpen={isPaymentModalOpen}
+                onClose={() => setIsPaymentModalOpen(false)}
+                totalAmount={calculateTotal()}
+            />
         </div>
     );
 } 
